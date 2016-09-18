@@ -1,0 +1,8 @@
+root
+admin
+vodafone
+movistar
+ono
+jazztel
+msfadmin
+user
