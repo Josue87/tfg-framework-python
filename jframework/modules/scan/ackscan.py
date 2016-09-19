@@ -13,9 +13,13 @@ except:
 
 class Ackscan(ModulePorts):
 
-    conf.verb = 0  # scapy don't show info
+    def __init__(self):
+        super(Ackscan, self).__init__()
+        conf.verb = 0  # scapy don't show info
+        if (os.getuid() != 0):
+            print("Attention: this task requires root")
 
-    def run(self, sessions):
+    def run(self):
         super(Ackscan, self).run()
         if(os.getuid() != 0):
             print("This task requires root")

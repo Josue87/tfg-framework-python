@@ -1,5 +1,5 @@
 from jframework.modules.model import Module
-from jframework.extras.consolessh import terminal_ssh
+from jframework.extras.console import terminal_ssh
 hasParamiko = True
 try:
     import paramiko
@@ -9,7 +9,8 @@ except:
 
 
 class Sshlogin(Module):
-    def run(self, session):
+
+    def run(self):
         if(not hasParamiko):
             print("It's required install paramiko module")
             return
@@ -27,6 +28,7 @@ class Sshlogin(Module):
                 print("SUCCESS: " + str(user) + ":" + str(password))
                 print("Write exit to go out")
                 terminal_ssh(client, str(self.HOST) + ".ssh")
+                client.close()
                 break
             except Exception as e:
                 if("Authentication failed." == str(e)):
@@ -34,5 +36,7 @@ class Sshlogin(Module):
                 else:
                     print("Service ssh not found")
                     break
-
-            client.close()
+            try:
+                client.close()
+            except:
+                pass

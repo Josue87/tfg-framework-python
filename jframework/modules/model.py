@@ -13,7 +13,7 @@ class Module(metaclass=abc.ABCMeta):
         self.abortar = False
 
     @abc.abstractmethod
-    def run(self, session=[]):
+    def run(self):
         print("Work in progress")
 
     def help(self):
@@ -52,7 +52,7 @@ class Module(metaclass=abc.ABCMeta):
 
 
 # Module whit ports configuration
-class ModulePorts(Module):
+class ModulePorts(Module, metaclass=abc.ABCMeta):
 
     def __init__(self):
         super(ModulePorts, self).__init__()

@@ -3,7 +3,7 @@ import jframework.extras.writeformat as wf
 import abc
 import threading
 
-MAXTHREADS = 10
+MAXTHREADS = 4
 
 class _Bruteforce(Module, metaclass=abc.ABCMeta):
 
@@ -18,7 +18,7 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
     def worker(self, user, password):
         pass
 
-    def run(self, list_sessions):
+    def run(self):
         super(_Bruteforce, self).run()
         try:
             users = open(self.userFile, "r")

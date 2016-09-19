@@ -1,6 +1,7 @@
 from jframework.modules.login._bruteforce import _Bruteforce
 import urllib.request as ur
 import http.client
+import sys
 
 
 class Httpbruteforce(_Bruteforce):
@@ -8,7 +9,7 @@ class Httpbruteforce(_Bruteforce):
     def __init__(self):
         super(Httpbruteforce, self).__init__()
         self.realm_router = None
-        self.find = False
+        self.login_found = 0
 
     def get_realm(self):
         try:
@@ -34,14 +35,17 @@ class Httpbruteforce(_Bruteforce):
             pag = ur.urlopen("http://" + str(self.HOST))
             if (pag.getcode() == 200):
                 print("[+] Login found: " + str(user) + ":" + str(password))
-                self.find = True
-        except:
+                self.login_found += 1
+        except Exception as e:
+            if("refused" in str(e)):
+                self.abortar = True
+                self.num_threads -= 1
+                sys.exit(0)
             if (self.verb):
                 print("[-] " + str(user) + ":" + str(password) + " >> failed")
         self.num_threads -= 1
 
-    def run(self, list_sessions):
-
+    def run(self):
         self.realm_router = self.get_realm()
 
         if self.realm_router is None:
@@ -52,9 +56,7 @@ class Httpbruteforce(_Bruteforce):
             print("Connection refused")
             return
 
-        super(Httpbruteforce, self).run(list_sessions)
+        self.login_found = 0
+        super(Httpbruteforce, self).run()
 
-        if not self.find:
-            print("Login not found.")
-
-        self.find = False
+        print("Found", self.login_found, "logins for HTTP")

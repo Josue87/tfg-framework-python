@@ -48,7 +48,7 @@ class _Banner(Module, metaclass=abc.ABCMeta):
     def check(self):
         pass
 
-    def run(self, session):
+    def run(self):
         super(_Banner, self).run()
         banner = self.check()
         if(banner is None):

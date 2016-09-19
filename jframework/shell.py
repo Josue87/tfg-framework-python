@@ -4,10 +4,10 @@ import signal
 from jframework.extras.load import loadModule
 from jframework.extras.exceptions import MyError
 from jframework.extras.autocomplete import MyCompleter
-from jframework.extras.consolessh import terminal_ssh
+from jframework.extras.console import terminal
 import atexit
 import readline
-import threading
+import concurrent.futures
 
 
 class Shell():
@@ -16,6 +16,7 @@ class Shell():
         self.myModule = None
         self.nameModule = None
         self.sessions = []
+        self.future_result = None
 
     def prompt(self, module=None):
         if (module is None):
@@ -54,7 +55,7 @@ class Shell():
         if(len(self.sessions)):
             i = 0
             for s in self.sessions:
-                print(s["id"], "\t", s["ip"] ,"\t", s["user"])
+                print(s["id"], "\t", s["ip"] ,"\t", s["user"],"\t[" + s["type"] + "]")
                 i += 1
         else:
             print("There are no sessions")
@@ -68,7 +69,11 @@ class Shell():
                 break
             i += 1
         if(my_session is not None):
-            terminal_ssh(my_session["session"], my_session["ip"])
+            try:
+                terminal(my_session["session"], my_session["ip"], my_session["type"])
+            except:
+                print("✕ Session error... Deleted")
+                self.delete_session(my_session[id])
         else:
             print("Session", id, "not found")
 
@@ -126,9 +131,15 @@ class Shell():
 
             operation = operation.strip()
             op = self.strip_own(operation)
+
             if(not op):
                 continue
+
             op[0] = op[0].lower()
+
+            if(op[0] == "exit"):
+                break
+
             if(op[0] != '' and op[0] != "exit"):
                 if(op[0] == "show_modules"):
                     self.listModules()
@@ -148,9 +159,11 @@ class Shell():
                 try:
                     if(len(op) == 1):
                         if(op[0] == "run"):
-                            th = threading.Thread(target=self.myModule.run, args=(self.sessions,))
-                            th.start()
-                            th.join()
+                            executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+                            self.future_result = executor.submit(self.myModule.run)
+                            self.future_result.add_done_callback(self.return_result)
+                            while(not self.future_result.done()):
+                                pass
                         else:
                             getattr(self.myModule, op[0])()
                     else:
@@ -186,9 +199,22 @@ class Shell():
             except:
                 pass
 
+    def return_result(self, future):
+        if future.result() is None:
+            return
+        for session in future.result():
+            session["id"] = self.get_id_session()
+            self.sessions.append(session)
+
+    def get_id_session(self):
+        id = 1
+        for s in self.sessions:
+            if(s["id"] >= id):
+                id = s["id"] + 1
+        return id
+
     def signal_handler(self, signal, frame):
-            threads = threading.enumerate()
-            if(len(threads) > 1):
+            if(self.future_result is not None and self.future_result.running()):
                 print("Abort!")
                 self.myModule.set_abortar()
             else:
