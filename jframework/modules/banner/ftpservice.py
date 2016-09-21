@@ -8,7 +8,7 @@ class Ftpservice(_Banner):
         ftp = FTP()
         try:
             # ftp abierto '193.43.36.131'
-            ftp.connect(self.HOST, self.PORTS[0])
+            ftp.connect(self.HOST, 21)
             return ftp.getwelcome()
         except:
             print("Connection refused")

@@ -5,6 +5,7 @@ import threading
 
 MAXTHREADS = 4
 
+
 class _Bruteforce(Module, metaclass=abc.ABCMeta):
 
     def __init__(self):
@@ -13,6 +14,11 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
         self.passwordFile = "jframework/files/passwords.txt"
         self.verb = True
         self.num_threads = 0
+
+    def get_options(self):
+        options = super(_Bruteforce,self).get_options()
+        options.extend(["users", "passwords", "verbose"])
+        return options
 
     @abc.abstractmethod
     def worker(self, user, password):
@@ -31,8 +37,6 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
         print("This module can be slow. Patience.")
         for u in users:
             u2 = u.strip()
-            if (self.abortar):
-                break
             for p in passwords:
                 p = p.strip()
                 while self.num_threads >= MAXTHREADS:
@@ -42,13 +46,9 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
                 threads.append(th)
                 self.num_threads += 1
                 th.start()
-                if (self.abortar):
-                    break
 
         for t in threads:
             t.join()
-
-        self.abortar = False
 
     def users(self, u):
         self.userFile = u
@@ -65,8 +65,6 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
     def help(self):
         super(_Bruteforce, self).help()
         print("verbose <YES/NO> -> show info when a module is running")
-        print("users <file_name> -> Load the username")
-        print("passwords <file_name> -> Load the passwords")
 
     def conf(self):
         super(_Bruteforce, self).conf()

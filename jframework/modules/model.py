@@ -10,19 +10,21 @@ class Module(metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.HOST = "127.0.0.1"
-        self.abortar = False
 
     @abc.abstractmethod
     def run(self):
         print("Work in progress")
 
+    def get_options(self):
+        return ["ip"]
+
     def help(self):
         print("--- Operations allowed ---")
         print("load module -> Load the module to use")
         print("help -> Show the help")
-        print("ip <host> -> Set the IP target (Default: 127.0.0.1)")
+        print("set <option> <parameter> -> Set the options")
         print("conf -> Show configuration")
-        print("show_modules -> List all modules availables")
+        print("modules -> List all modules availables")
         print("show_sessions -> List the open sessions")
         print("session <id> -> Select session")
         print("delete_session <id> -> Remove session")
@@ -48,7 +50,7 @@ class Module(metaclass=abc.ABCMeta):
         wf.printf("ip", self.HOST, "IP target")
 
     def set_abortar(self):
-        self.abortar = True
+        self.abort_task = True
 
 
 # Module whit ports configuration
@@ -58,9 +60,10 @@ class ModulePorts(Module, metaclass=abc.ABCMeta):
         super(ModulePorts, self).__init__()
         self.PORTS = [80]
 
-    def help(self):
-        super(ModulePorts, self).help()
-        print("ports <1[,2,n]> -> Set the ports")
+    def get_options(self):
+        options = super(ModulePorts,self).get_options()
+        options.append("ports")
+        return options
 
     def ports(self, p):
         print("Port/s setting: " + str(p))

@@ -1,6 +1,6 @@
 from jframework.modules.login._bruteforce import _Bruteforce
 import threading
-import sys
+import sys, time
 hasParamiko = True
 try:
     import paramiko
@@ -17,8 +17,7 @@ class Sshbruteforce(_Bruteforce):
         self.sessions = []
 
     def worker(self, user, password):
-        if(self.abortar):
-            return
+        time.sleep(1)
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
@@ -30,7 +29,6 @@ class Sshbruteforce(_Bruteforce):
         except Exception as e:
             if "is not subscriptable" in str(e):
                 print("No SSH service")
-                self.abortar = True
                 self.num_threads -= 1
                 sys.exit(0)
             if(self.verb):

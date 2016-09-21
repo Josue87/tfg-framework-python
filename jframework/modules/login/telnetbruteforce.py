@@ -9,8 +9,6 @@ class Telnetbruteforce(_Bruteforce):
         self.login_found = 0
 
     def worker(self, user, password):
-        if(self.abortar):
-            return
         try:
             tn = telnetlib.Telnet(self.HOST, 23, 1)
             tn.read_until((b"login: " or b"Login: " ))
@@ -36,5 +34,12 @@ class Telnetbruteforce(_Bruteforce):
 
     def run(self):
         self.login_found = 0
+        tn = telnetlib.Telnet(self.HOST, 23, 1)
+        inicio = tn.read_until((b"Password: " or b"password: "), timeout=2)
+        if ("password" in inicio.decode("ascii").lower()):
+            print("It doesn't work with that kind of telnet")
+            tn.close()
+            return
+        tn.close()
         super(Telnetbruteforce, self).run()
         print("Found", self.login_found, "logins for Telnet")

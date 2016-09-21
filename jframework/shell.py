@@ -8,6 +8,7 @@ from jframework.extras.console import terminal
 import atexit
 import readline
 import concurrent.futures
+import time
 
 
 class Shell():
@@ -16,7 +17,6 @@ class Shell():
         self.myModule = None
         self.nameModule = None
         self.sessions = []
-        self.future_result = None
 
     def prompt(self, module=None):
         if (module is None):
@@ -110,17 +110,21 @@ class Shell():
 
         """)
 
-    def start(self):
-        signal.signal(signal.SIGINT, self.signal_handler)
-        completer = MyCompleter(["exit", "load", "show_modules",
-                       "help", "conf", "ports", "ip", "users", "verbose",
-                       "passwords", "run", "file", "show_sessions", "session", "delete_session"])
+    def initial(self):
+        self.completer = MyCompleter(["exit", "load", "modules",
+                                 "help", "show_sessions",
+                                      "session", "delete_session"], self)
 
-        readline.set_history_length(40)  #max 40
+        readline.set_history_length(40)  # max 40
         readline.set_completer_delims(' \t\n;')  # override the delims (I want /)
         readline.parse_and_bind("tab: complete")
-        readline.set_completer(completer.complete)
+        readline.set_completer(self.completer.complete)
 
+    def get_module(self):
+        return self.myModule
+
+    def start(self):
+        self.initial()
         operation = ""
         self.draw_init()
         while operation.lower() != "exit":
@@ -141,7 +145,7 @@ class Shell():
                 break
 
             if(op[0] != '' and op[0] != "exit"):
-                if(op[0] == "show_modules"):
+                if(op[0] == "modules"):
                     self.listModules()
                     continue
 
@@ -153,29 +157,34 @@ class Shell():
                            op[0] != "delete_session" and self.myModule is None):
                     print("⚠ First load a module")
                     print("The syntax is load module")
-                    print("To show the modules availables: show_modules")
+                    print("To show the modules availables put: modules")
                     continue
 
                 try:
                     if(len(op) == 1):
                         if(op[0] == "run"):
-                            executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
-                            self.future_result = executor.submit(self.myModule.run)
-                            self.future_result.add_done_callback(self.return_result)
-                            while(not self.future_result.done()):
-                                pass
+                            res = self.myModule.run()
+                            self.return_result(res)
                         else:
                             getattr(self.myModule, op[0])()
                     else:
                         if(op[0] == "load"):
                             self.myModule = self.load_module(op[1].strip().lower())
                             self.nameModule = op[1].strip()
+                            self.completer.extend_completer(["put", "run", "conf"])
                         elif(op[0] == "session"):
                             self.start_session(op[1])
                         elif(op[0] == "delete_session"):
                             self.delete_session(op[1])
                         else:
-                            getattr(self.myModule, op[0])(op[1])
+                            if(op[0] == "put"):
+                                if(len(op) == 3):
+                                    getattr(self.myModule, op[1])(op[2])
+                                else:
+                                    print("Parameter is not found")
+                                    continue
+                            else:
+                                getattr(self.myModule, op[0])(op[1])
                 except MyError as e:
                     print(e)
                 except Exception as e:
@@ -192,6 +201,8 @@ class Shell():
         return mylist
 
     def close_sessions(self):
+        if(len(self.sessions) == 0):
+            return
         i = 0
         for s in self.sessions:
             try:
@@ -199,10 +210,10 @@ class Shell():
             except:
                 pass
 
-    def return_result(self, future):
-        if future.result() is None:
+    def return_result(self, res):
+        if res is None:
             return
-        for session in future.result():
+        for session in res:
             session["id"] = self.get_id_session()
             self.sessions.append(session)
 
@@ -212,13 +223,3 @@ class Shell():
             if(s["id"] >= id):
                 id = s["id"] + 1
         return id
-
-    def signal_handler(self, signal, frame):
-            if(self.future_result is not None and self.future_result.running()):
-                print("Abort!")
-                self.myModule.set_abortar()
-            else:
-                print('\nThe tool has been closed: Ctrl + C')
-                self.close_sessions()
-                sys.exit(0)
-

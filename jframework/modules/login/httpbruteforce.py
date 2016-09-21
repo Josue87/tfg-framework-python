@@ -38,12 +38,12 @@ class Httpbruteforce(_Bruteforce):
                 self.login_found += 1
         except Exception as e:
             if("refused" in str(e)):
-                self.abortar = True
                 self.num_threads -= 1
                 sys.exit(0)
             if (self.verb):
                 print("[-] " + str(user) + ":" + str(password) + " >> failed")
         self.num_threads -= 1
+        sys.exit(0)
 
     def run(self):
         self.realm_router = self.get_realm()

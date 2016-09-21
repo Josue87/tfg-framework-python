@@ -9,6 +9,11 @@ class _Banner(Module, metaclass=abc.ABCMeta):
         super(_Banner, self).__init__()
         self.FILE_READ = ""
 
+    def get_options(self):
+        options = super(_Banner,self).get_options()
+        options.extend(["file"])
+        return options
+
     def file(self, f):
         self.FILE_READ = f
 
@@ -31,10 +36,6 @@ class _Banner(Module, metaclass=abc.ABCMeta):
 
         return vulnerable, cve
 
-    def help(self):
-        super(_Banner, self).help()
-        print("file <file_name> -> Set the file with vulnerabilities")
-
     def conf(self):
         super(_Banner, self).conf()
         thisfile = self.FILE_READ.split("/")
@@ -42,7 +43,7 @@ class _Banner(Module, metaclass=abc.ABCMeta):
             thisfile = "\' \'"
         else:
             thisfile = thisfile[-1]
-        wf.printf("file", thisfile, "File whit vulnerabilities", "No")
+        wf.printf("file", thisfile, "File whit vulnerabilities [service:cve]", "No")
 
     @abc.abstractmethod
     def check(self):

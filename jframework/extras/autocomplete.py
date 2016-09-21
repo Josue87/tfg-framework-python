@@ -5,8 +5,12 @@ import os
 
 class MyCompleter():
 
-    def __init__(self, commands):
+    def __init__(self, commands, s):
         self.COMMANDS = commands
+        self.shell = s
+
+    def extend_completer(self,options):
+        self.COMMANDS.extend(options)
 
     def _list_directories(self, root, route):
         my_list = []
@@ -45,7 +49,15 @@ class MyCompleter():
             return self._complete_path(route=path)
         
         return self._complete_path(args[-1], path)
-    
+
+    def complete_put(self,args):
+        current_module = self.shell.get_module()
+        if current_module is not None:
+            options = current_module.get_options()
+            my_list = [option + ' ' for option in options if (option.startswith(args[0].strip(" ")) and option != args[0])]
+            return my_list
+        return ""
+
     def complete_file(self, args):
         path = os.path.join("jframework", "files")
         if not args:
