@@ -4,7 +4,6 @@ hasParamiko = True
 try:
     import paramiko
 except:
-    print("✕ It's required install paramiko module to run openssh")
     hasParamiko = False
 
 
@@ -40,9 +39,11 @@ class Openssh(Module):
             time1 = time.clock()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             try:
-                client.connect(self.HOST, username=line, password=(26000 * 'J'))
+                client.connect(self.HOST, username=line, password=(26000 * 'J'), timeout=2)
             except Exception as e:
-                if "is not subscriptable" in str(e):
+                elements = ["timed out", "is not subscriptable" ]
+
+                if elements[0] in str(e) or elements[1] in str(e):
                     print("Not SSH service")
                     return
                 time2 = time.clock()

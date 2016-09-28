@@ -19,11 +19,11 @@ class Telnetbruteforce(_Bruteforce):
             tn.write(b"exit\n")
             tn.read_all()
             tn.close()
-            print("[+] " + str(user) + ":" + str(password) + " >> OK")
+            self.print_result(user, password, error=False)
             self.login_found += 1
         except Exception as e:
             if (self.verb):
-                print("[-] " + str(user) + ":" + str(password) + " >> failed")
+                self.print_result(user, password, error=True)
             try:
                 tn.close()
             except:

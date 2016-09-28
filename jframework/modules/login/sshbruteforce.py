@@ -22,7 +22,7 @@ class Sshbruteforce(_Bruteforce):
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             client.connect(self.HOST, username=user, password=password)
-            print("[+] " + str(user) + ":" + str(password) + " >> OK")
+            self.print_result(user, password, error=False)
             self.lock.acquire()
             self.sessions.append({"id": 0, "ip": self.HOST, "session": client, "user": user, "type":"ssh"})
             self.lock.release()
@@ -32,7 +32,7 @@ class Sshbruteforce(_Bruteforce):
                 self.num_threads -= 1
                 sys.exit(0)
             if(self.verb):
-                print("[-] " + str(user) + ":" + str(password) + " >> failed")
+               self.print_result(user,password, error=True)
             try:
                 client.close()
             except:

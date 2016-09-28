@@ -82,3 +82,9 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
         else:
             v = "False"
         wf.printf("verbose", v, "Show info", "No")
+
+    def print_result(self,user, password, error=True):
+        if error:
+            print(chr(27) + "[1;31m[-] " + chr(27) + "[0m" + str(user) + ":" + str(password) + " >> failed")
+        else:
+            print(chr(27) + "[1;34m[+] " + chr(27) + "[0m" + str(user) + ":" + str(password) + " >> OK")

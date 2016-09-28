@@ -58,13 +58,6 @@ class MyCompleter():
             return my_list
         return ""
 
-    def complete_file(self, args):
-        path = os.path.join("jframework", "files")
-        if not args:
-            return self._complete_path(route=path)
-
-        return self._complete_path(args[-1], path)
-
     def complete(self, text, state):
         buffer = readline.get_line_buffer()
         line = buffer.split()

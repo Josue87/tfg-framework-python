@@ -34,14 +34,14 @@ class Httpbruteforce(_Bruteforce):
             ur.install_opener(opener)
             pag = ur.urlopen("http://" + str(self.HOST))
             if (pag.getcode() == 200):
-                print("[+] Login found: " + str(user) + ":" + str(password))
+                self.print_result(user, password, error=False)
                 self.login_found += 1
         except Exception as e:
             if("refused" in str(e)):
                 self.num_threads -= 1
                 sys.exit(0)
             if (self.verb):
-                print("[-] " + str(user) + ":" + str(password) + " >> failed")
+                self.print_result(user, password, error=True)
         self.num_threads -= 1
         sys.exit(0)
 

@@ -49,9 +49,6 @@ class Module(metaclass=abc.ABCMeta):
         wf.printf("------", "-----", "-----------", "--------")
         wf.printf("ip", self.HOST, "IP target")
 
-    def set_abortar(self):
-        self.abort_task = True
-
 
 # Module whit ports configuration
 class ModulePorts(Module, metaclass=abc.ABCMeta):

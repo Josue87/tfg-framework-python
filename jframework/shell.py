@@ -1,14 +1,10 @@
 import os
-import sys
-import signal
 from jframework.extras.load import loadModule
 from jframework.extras.exceptions import MyError
 from jframework.extras.autocomplete import MyCompleter
 from jframework.extras.console import terminal
 import atexit
 import readline
-import concurrent.futures
-import time
 
 
 class Shell():
@@ -20,9 +16,9 @@ class Shell():
 
     def prompt(self, module=None):
         if (module is None):
-            return "⚤ >> "
+            return "jf >> "
         else:
-            return "⚤ (\001\033[91m\002" + str(module) + "\001\033[0m\002) >> "
+            return "jf (\001\033[91m\002" + str(module) + "\001\033[0m\002) >> "
 
     if(os.getuid() != 0):
         historyPath = os.path.expanduser("~/.jfhistory")
@@ -111,8 +107,7 @@ class Shell():
         """)
 
     def initial(self):
-        self.completer = MyCompleter(["exit", "load", "modules",
-                                 "help", "show_sessions",
+        self.completer = MyCompleter(["exit", "load", "modules", "show_sessions",
                                       "session", "delete_session"], self)
 
         readline.set_history_length(40)  # max 40
@@ -127,72 +122,74 @@ class Shell():
         self.initial()
         operation = ""
         self.draw_init()
-        while operation.lower() != "exit":
-            if(self.myModule is None):
+        while operation != "exit":
+            if (self.myModule is None):
                 operation = input(self.prompt())
             else:
                 operation = input(self.prompt(self.nameModule.split("/")[1]))
-
-            operation = operation.strip()
-            op = self.strip_own(operation)
-
-            if(not op):
-                continue
-
-            op[0] = op[0].lower()
-
-            if(op[0] == "exit"):
-                break
-
-            if(op[0] != '' and op[0] != "exit"):
-                if(op[0] == "modules"):
-                    self.listModules()
-                    continue
-
-                if(op[0] == "show_sessions"):
-                    self.list_sessions()
-                    continue
-
-                if(op[0] != 'load' and op[0] != "session" and
-                           op[0] != "delete_session" and self.myModule is None):
-                    print("⚠ First load a module")
-                    print("The syntax is load module")
-                    print("To show the modules availables put: modules")
-                    continue
-
-                try:
-                    if(len(op) == 1):
-                        if(op[0] == "run"):
-                            res = self.myModule.run()
-                            self.return_result(res)
-                        else:
-                            getattr(self.myModule, op[0])()
-                    else:
-                        if(op[0] == "load"):
-                            self.myModule = self.load_module(op[1].strip().lower())
-                            self.nameModule = op[1].strip()
-                            self.completer.extend_completer(["put", "run", "conf"])
-                        elif(op[0] == "session"):
-                            self.start_session(op[1])
-                        elif(op[0] == "delete_session"):
-                            self.delete_session(op[1])
-                        else:
-                            if(op[0] == "put"):
-                                if(len(op) == 3):
-                                    getattr(self.myModule, op[1])(op[2])
-                                else:
-                                    print("Parameter is not found")
-                                    continue
-                            else:
-                                getattr(self.myModule, op[0])(op[1])
-                except MyError as e:
-                    print(e)
-                except Exception as e:
-                    print("⚠ The operation" + str(op[0]) +
-                    " isn't permit, use help command.")
-                    print(e)
+            operation = operation.lower().strip()
+            self.exec_command(operation)
         self.close_sessions()
         print("[*] The tool has been closed.")
+
+    def first_exec(self,op):
+        result = True
+        if (len(op) == 0 or op[0] == "exit"):
+            result = False
+
+        elif (op[0] == "modules"):
+            self.listModules()
+            result = False
+
+        elif (op[0] == "show_sessions"):
+            self.list_sessions()
+            result = False
+
+        return result
+
+    def exec_command(self, operation):
+        op = self.strip_own(operation)
+
+        if (self.first_exec(op) and op[0] != ''):
+
+            if (op[0] != 'load' and op[0] != "session" and
+                        op[0] != "delete_session" and self.myModule is None):
+                print("⚠ First load a module")
+                print("The syntax is load module")
+                print("To show the modules availables write: modules")
+                return
+
+            try:
+                if (len(op) == 1):
+                    if (op[0] == "run"):
+                        res = self.myModule.run()
+                        self.return_result(res)
+                    else:
+                        getattr(self.myModule, op[0])()
+                else:
+                    if (op[0] == "load"):
+                        self.myModule = self.load_module(op[1].strip())
+                        self.nameModule = op[1].strip()
+                        self.completer.extend_completer(["put", "run", "conf", "help"])
+                    elif (op[0] == "session"):
+                        self.start_session(op[1])
+                    elif (op[0] == "delete_session"):
+                        self.delete_session(op[1])
+                    else:
+                        if (op[0] == "put"):
+                            if (len(op) >= 3):
+                                getattr(self.myModule, op[1])(op[2])
+                            else:
+                                print("Parameter is not found")
+                                return
+                        else:
+                            getattr(self.myModule, op[0])(op[1])
+            except MyError as e:
+                print(e)
+            except Exception as e:
+                print("⚠ Error with operation " + str(op[0]) +
+                      ". use help command.")
+                print(e)
 
     def strip_own(self, line):
         mylist = line.split(" ")

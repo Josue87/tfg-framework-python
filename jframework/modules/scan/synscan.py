@@ -1,8 +1,6 @@
-import socket
 import logging
 # Disable warning IPv6
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
-import os
 from jframework.modules.model import ModulePorts
 try:
     from scapy.all import *
@@ -10,6 +8,7 @@ try:
 except:
     print("✕ It's required install scapy module to run syn scan")
     hasScapy = False
+import sys
 
 
 class Synscan(ModulePorts):
@@ -17,8 +16,6 @@ class Synscan(ModulePorts):
     def __init__(self):
         super(Synscan, self).__init__()
         conf.verb = 0  # scapy don't show info
-        if (os.getuid() != 0):
-            print("Attention: this task requires root")
 
     def run(self):
         super(Synscan, self).run()
