@@ -75,15 +75,17 @@ class Shell():
 
     def delete_session(self, id):
         my_session = None
-        i = 0
         for s in self.sessions:
             if (str(s["id"]) == id):
                 my_session = s
                 break
-            i += 1
         if (my_session is not None):
             self.sessions.remove(my_session)
-            my_session["session"].close()
+            try:
+                my_session["session"].close()
+            except:
+                print("The session was closed ")
+                return
             print("Close session", id)
         else:
             print("Session", id, "not found")
@@ -211,8 +213,20 @@ class Shell():
         if res is None:
             return
         for session in res:
+            if(self.exist_session(session)):
+                continue
             session["id"] = self.get_id_session()
             self.sessions.append(session)
+
+    def exist_session(self,session):
+        for s in self.sessions:
+            if s["user"] == session["user"] and s["type"] == session["type"]:
+                try:
+                    session["session"].close()
+                except:
+                    pass
+                return True
+        return False
 
     def get_id_session(self):
         id = 1

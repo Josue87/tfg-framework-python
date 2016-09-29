@@ -9,6 +9,10 @@ class _Banner(Module, metaclass=abc.ABCMeta):
         super(_Banner, self).__init__()
         self.FILE_READ = ""
 
+    def help(self):
+        options = super(_Banner, self).help()
+        print("file <number_file> -> set de file with lines service:cve")
+
     def get_options(self):
         options = super(_Banner,self).get_options()
         options.extend(["file"])

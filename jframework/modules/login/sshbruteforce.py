@@ -26,6 +26,7 @@ class Sshbruteforce(_Bruteforce):
             self.lock.acquire()
             self.sessions.append({"id": 0, "ip": self.HOST, "session": client, "user": user, "type":"ssh"})
             self.lock.release()
+            self.login_found += 1
         except Exception as e:
             if "is not subscriptable" in str(e):
                 print("No SSH service")

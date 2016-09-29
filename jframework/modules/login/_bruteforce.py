@@ -3,7 +3,7 @@ import jframework.extras.writeformat as wf
 import abc
 import threading
 
-MAXTHREADS = 4
+import queue
 
 
 class _Bruteforce(Module, metaclass=abc.ABCMeta):
@@ -14,32 +14,48 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
         self.passwordFile = "jframework/files/passwords.txt"
         self.verb = True
         self.num_threads = 0
+        self.login_found = 0
+        self.maxthreads = 4
 
     def get_options(self):
         options = super(_Bruteforce,self).get_options()
-        options.extend(["users", "passwords", "verbose"])
+        options.extend(["users", "passwords", "verbose", "threads"])
         return options
 
     @abc.abstractmethod
     def worker(self, user, password):
         pass
 
+    def read_files(self):
+        users_file = open(self.userFile, "r")
+        passwords_file = open(self.passwordFile, "r")
+        users = users_file.read().split("\n")
+        passwords = passwords_file.read().split("\n")
+        try:
+            users_file.close()
+            passwords_file.close()
+        except:
+            pass
+
+        return users, passwords
+
     def run(self):
         super(_Bruteforce, self).run()
         try:
-            users = open(self.userFile, "r")
-            passwords = open(self.passwordFile, "r").read().split("\n")
+          users, passwords = self.read_files()
         except:
             print("✕ Error in some file")
             return
 
-        threads = []
+        self.login_found = 0
         print("This module can be slow. Patience.")
+        threads = []
+
         for u in users:
             u2 = u.strip()
             for p in passwords:
                 p = p.strip()
-                while self.num_threads >= MAXTHREADS:
+                while self.num_threads >= self.maxthreads:
                     pass
 
                 th = threading.Thread(target=self.worker, args=(u2, p))
@@ -50,11 +66,25 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
         for t in threads:
             t.join()
 
+        print("Found", self.login_found, "logins")
+
     def users(self, u):
         self.userFile = u
 
     def passwords(self, p):
         self.passwordFile = p
+
+    def threads(self,number):
+        try:
+            number = int(number)
+        except:
+            pass
+        if(number > 10):
+            self.maxthreads = 10
+        elif(number < 0):
+            self.maxthreads = 1
+        else:
+            self.maxthreads = number
 
     def verbose(self, v):
         if(v.lower() == "yes"):
@@ -64,6 +94,9 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
 
     def help(self):
         super(_Bruteforce, self).help()
+        print("threads <number> -> set the number of threads (1..10)")
+        print("users <file_users> -> set the file with the users")
+        print("passwords <file_passwords> -> set the file with the passwords")
         print("verbose <YES/NO> -> show info when a module is running")
 
     def conf(self):
@@ -77,6 +110,7 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
             print(e)
         wf.printf("users", uf, "File whit the users")
         wf.printf("passwords", pf, "File whit passwords")
+        wf.printf("threads", str(self.maxthreads), "Number of threads(1..20)", "No")
         if(self.verb):
             v = "True"
         else:

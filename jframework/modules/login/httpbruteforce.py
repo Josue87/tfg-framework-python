@@ -9,7 +9,6 @@ class Httpbruteforce(_Bruteforce):
     def __init__(self):
         super(Httpbruteforce, self).__init__()
         self.realm_router = None
-        self.login_found = 0
 
     def get_realm(self):
         try:
@@ -24,6 +23,7 @@ class Httpbruteforce(_Bruteforce):
             return None
 
     def worker(self, user, password):
+
         try:
             auth_handler = ur.HTTPBasicAuthHandler()
             auth_handler.add_password(realm=self.realm_router,
@@ -42,6 +42,7 @@ class Httpbruteforce(_Bruteforce):
                 sys.exit(0)
             if (self.verb):
                 self.print_result(user, password, error=True)
+
         self.num_threads -= 1
         sys.exit(0)
 
@@ -56,7 +57,6 @@ class Httpbruteforce(_Bruteforce):
             print("Connection refused")
             return
 
-        self.login_found = 0
         super(Httpbruteforce, self).run()
 
-        print("Found", self.login_found, "logins for HTTP")
+

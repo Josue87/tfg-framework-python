@@ -11,7 +11,6 @@ class TestOptions(unittest.TestCase):
         self.shell.myModule = mock.MagicMock()
         self.shell.completer = mock.MagicMock()
 
-
     def test_exec_command(self):
         host = '127.0.0.1'
         new_host = "192.168.0.1"
