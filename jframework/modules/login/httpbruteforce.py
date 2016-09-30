@@ -35,10 +35,13 @@ class Httpbruteforce(_Bruteforce):
             pag = ur.urlopen("http://" + str(self.HOST))
             if (pag.getcode() == 200):
                 self.print_result(user, password, error=False)
-                self.login_found += 1
+                self.lock.acquire()
+                self.add_credential(user, password, "http")
+                self.lock.release()
         except Exception as e:
             if("refused" in str(e)):
                 self.num_threads -= 1
+                self.error += 1
                 sys.exit(0)
             if (self.verb):
                 self.print_result(user, password, error=True)
@@ -59,4 +62,4 @@ class Httpbruteforce(_Bruteforce):
 
         super(Httpbruteforce, self).run()
 
-
+        return self.sessions, self.credentials

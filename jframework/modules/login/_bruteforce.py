@@ -3,8 +3,6 @@ import jframework.extras.writeformat as wf
 import abc
 import threading
 
-import queue
-
 
 class _Bruteforce(Module, metaclass=abc.ABCMeta):
 
@@ -13,9 +11,12 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
         self.userFile = "jframework/files/users.txt"
         self.passwordFile = "jframework/files/passwords.txt"
         self.verb = True
+        self.lock = threading.Lock()
         self.num_threads = 0
-        self.login_found = 0
         self.maxthreads = 4
+        self.error = 0
+        self.sessions = []
+        self.credentials = []
 
     def get_options(self):
         options = super(_Bruteforce,self).get_options()
@@ -47,26 +48,36 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
             print("✕ Error in some file")
             return
 
-        self.login_found = 0
+        self.sessions = []
+        self.credentials = []
+        self.error = 0
         print("This module can be slow. Patience.")
         threads = []
-
-        for u in users:
-            u2 = u.strip()
-            for p in passwords:
-                p = p.strip()
-                while self.num_threads >= self.maxthreads:
-                    pass
-
-                th = threading.Thread(target=self.worker, args=(u2, p))
-                threads.append(th)
-                self.num_threads += 1
-                th.start()
+        try:
+            for u in users:
+                if(self.error > 2):
+                    break
+                u2 = u.strip()
+                for p in passwords:
+                    p = p.strip()
+                    while self.num_threads >= self.maxthreads:
+                        pass
+                    if(self.error > 2):
+                        break
+                    th = threading.Thread(target=self.worker, args=(u2, p))
+                    threads.append(th)
+                    self.num_threads += 1
+                    th.start()
+        except KeyboardInterrupt:
+            print("close bruteforce")
 
         for t in threads:
             t.join()
 
-        print("Found", self.login_found, "logins")
+        print("Found", len(self.credentials), "logins")
+        print(len(self.sessions), "sessions open")
+
+       # return self.sessions,self.credentials
 
     def users(self, u):
         self.userFile = u
@@ -91,6 +102,12 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
             self.verb = True
         else:
             self.verb = False
+
+    def add_credential(self, user, password, type):
+        self.credentials.append({"ip": self.HOST, "user": user, "password": password, "type": type})
+
+    def add_session(self, session, user, type):
+        self.sessions.append({"id": 0, "ip": self.HOST, "session": session, "user": user, "type": type})
 
     def help(self):
         super(_Bruteforce, self).help()

@@ -13,6 +13,7 @@ class Shell():
         self.myModule = None
         self.nameModule = None
         self.sessions = []
+        self.credentials = []
 
     def prompt(self, module=None):
         if (module is None):
@@ -49,12 +50,25 @@ class Shell():
 
     def list_sessions(self):
         if(len(self.sessions)):
-            i = 0
+            print(chr(27) + "[1;34m")
+            print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format("ID","HOST","User", "Type"))
+            print(chr(27) + "[0m")
             for s in self.sessions:
-                print(s["id"], "\t", s["ip"] ,"\t", s["user"],"\t[" + s["type"] + "]")
-                i += 1
+                print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format(str(s["id"]), s["ip"] , s["user"], s['type']))
+            print("")
         else:
             print("There are no sessions")
+
+    def list_credentials(self):
+        if(len(self.credentials)):
+            print(chr(27) + "[1;34m")
+            print("{:16}\t{:20}\t\t{:8}".format("HOST","User:Password", "Type"))
+            print(chr(27) + "[0m")
+            for c in self.credentials:
+                print("{:16}\t{:20}\t\t{:8}".format(c["ip"], c["user"]+":"+c["password"], c['type'] ))
+            print("")
+        else:
+            print("There are not credentials yet")
 
     def start_session(self, id):
         my_session = None
@@ -110,7 +124,7 @@ class Shell():
 
     def initial(self):
         self.completer = MyCompleter(["exit", "load", "modules", "show_sessions",
-                                      "session", "delete_session"], self)
+                                      "session", "delete_session", "credentials"], self)
 
         readline.set_history_length(40)  # max 40
         readline.set_completer_delims(' \t\n;')  # override the delims (I want /)
@@ -138,13 +152,14 @@ class Shell():
         result = True
         if (len(op) == 0 or op[0] == "exit"):
             result = False
-
         elif (op[0] == "modules"):
             self.listModules()
             result = False
-
         elif (op[0] == "show_sessions"):
             self.list_sessions()
+            result = False
+        elif (op[0] == "credentials"):
+            self.list_credentials()
             result = False
 
         return result
@@ -160,12 +175,15 @@ class Shell():
                 print("The syntax is load module")
                 print("To show the modules availables write: modules")
                 return
-
             try:
                 if (len(op) == 1):
                     if (op[0] == "run"):
-                        res = self.myModule.run()
-                        self.return_result(res)
+                        try:
+                            res_s, res_c = self.myModule.run()
+                            self.return_result_session(res_s)
+                            self.return_result_credential(res_c)
+                        except:
+                            pass
                     else:
                         getattr(self.myModule, op[0])()
                 else:
@@ -209,24 +227,37 @@ class Shell():
             except:
                 pass
 
-    def return_result(self, res):
-        if res is None:
+    def return_result_session(self, res):
+        if res is None or len(res) == 0:
             return
+
         for session in res:
-            if(self.exist_session(session)):
+            if(self.exist_in_list(self.sessions, session)):
                 continue
             session["id"] = self.get_id_session()
             self.sessions.append(session)
 
-    def exist_session(self,session):
-        for s in self.sessions:
-            if s["user"] == session["user"] and s["type"] == session["type"]:
+    def return_result_credential(self, res):
+        if res is None or len(res) == 0:
+            return
+
+        for credential in res:
+            if (self.exist_in_list(self.credentials, credential)):
+                continue
+            self.credentials.append(credential)
+
+    def exist_in_list(self,origin_list, element):
+        for el in origin_list:
+            if el["user"] == element["user"] and el["type"] == element["type"] and el["ip"] == element["ip"]:
                 try:
-                    session["session"].close()
+                    if(element["session"]):
+                        element["session"].close()
                 except:
                     pass
                 return True
         return False
+
+
 
     def get_id_session(self):
         id = 1

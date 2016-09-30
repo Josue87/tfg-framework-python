@@ -1,5 +1,4 @@
 from jframework.modules.login._bruteforce import _Bruteforce
-import threading
 import sys, time
 hasParamiko = True
 try:
@@ -11,11 +10,6 @@ except:
 
 class Sshbruteforce(_Bruteforce):
 
-    def __init__(self):
-        super(Sshbruteforce, self).__init__()
-        self.lock = threading.Lock()
-        self.sessions = []
-
     def worker(self, user, password):
         time.sleep(1)
         client = paramiko.SSHClient()
@@ -24,13 +18,14 @@ class Sshbruteforce(_Bruteforce):
             client.connect(self.HOST, username=user, password=password)
             self.print_result(user, password, error=False)
             self.lock.acquire()
-            self.sessions.append({"id": 0, "ip": self.HOST, "session": client, "user": user, "type":"ssh"})
+            self.add_credential(user, password, "ssh")
+            self.add_session(client, user, "ssh")
             self.lock.release()
-            self.login_found += 1
         except Exception as e:
             if "is not subscriptable" in str(e):
                 print("No SSH service")
                 self.num_threads -= 1
+                self.error += 1
                 sys.exit(0)
             if(self.verb):
                self.print_result(user,password, error=True)
@@ -45,12 +40,6 @@ class Sshbruteforce(_Bruteforce):
         if (not hasParamiko):
             print("✕  It's required install paramiko")
             return
-        self.sessions = []
+
         super(Sshbruteforce, self).run()
-        list_sessions = []
-
-        for session in self.sessions:
-            list_sessions.append(session)
-
-        print(len(list_sessions), " sessions open")
-        return list_sessions
+        return self.sessions, self.credentials
