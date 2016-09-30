@@ -17,8 +17,6 @@ class Ftpbruteforce(_Bruteforce):
             self.add_session(ftp, user, "ftp")
             self.lock.release()
         except Exception as e:
-            print(e)
-
             if self.verb:
                 self.print_result(user, password, error=True)
 
