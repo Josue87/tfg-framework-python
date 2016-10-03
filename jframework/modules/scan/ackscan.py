@@ -1,28 +1,22 @@
 import logging
 # Disable warning IPv6
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
-import os
 from jframework.modules.model import ModulePorts
+from jframework.extras.check_scapy import check
 try:
     from scapy.all import *
-    hasScapy = True
+    conf.verb = 0
 except:
-    print("✕ It's required install scapy module to run ack scan")
-    hasScapy = False
-
+    pass
 
 class Ackscan(ModulePorts):
 
-    def __init__(self):
-        super(Ackscan, self).__init__()
-
     def run(self):
         super(Ackscan, self).run()
-        if(os.getuid() != 0):
-            print("This task requires root")
-            return
-        if(not hasScapy):
-            print("It's required install scapy module")
+
+        resp = check()
+        if (resp != "ok"):
+            print(resp)
             return
 
         for port in self.PORTS:

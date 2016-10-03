@@ -66,7 +66,7 @@ class ModulePorts(Module, metaclass=abc.ABCMeta):
         print("Port/s setting: " + str(p))
         listaP = p.split(",")
         for i in range(0, len(listaP)):
-            listaP[i] = listaP[i].strip(" ")
+            listaP[i] = int(listaP[i].strip(" "))
             try:
                 if(int(listaP[i]) <= 0 or int(listaP[i]) > 65535):
                     raise Exception()
@@ -77,4 +77,17 @@ class ModulePorts(Module, metaclass=abc.ABCMeta):
 
     def conf(self):
         super(ModulePorts, self).conf()
-        wf.printf("ports", ','.join(map(str,self.PORTS)), "Ports configuration")
+        ports = ""
+        i = 0
+        for p in self.PORTS:
+            ports += str(p)
+            i += 1
+            if(len(self.PORTS) <= i):
+                break
+            ports += ","
+
+            if i>= 5:
+                ports += "..."
+                break
+
+        wf.printf("ports", ports, "Ports configuration")

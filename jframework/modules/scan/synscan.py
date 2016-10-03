@@ -2,28 +2,23 @@ import logging
 # Disable warning IPv6
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from jframework.modules.model import ModulePorts
+from jframework.extras.check_scapy import check
 try:
     from scapy.all import *
-    hasScapy = True
+    conf.verb = 0
 except:
-    print("✕ It's required install scapy module to run syn scan")
-    hasScapy = False
-import sys
+    pass
+
 
 
 class Synscan(ModulePorts):
 
-    def __init__(self):
-        super(Synscan, self).__init__()
-        conf.verb = 0  # scapy don't show info
-
     def run(self):
         super(Synscan, self).run()
-        if(os.getuid() != 0):
-            print("This task requires root")
-            return
-        if(not hasScapy):
-            print("It's required install scapy module")
+
+        resp = check()
+        if(resp != "ok"):
+            print(resp)
             return
 
         existOpen = False

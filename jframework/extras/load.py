@@ -13,7 +13,8 @@ def loadModule(module):
         sys.path.append(path)
         moduleAux = importlib.import_module(new_module[1])
         myClass = getattr(moduleAux, new_module[1].capitalize())()
-    except:
+    except Exception as e:
+        print(e)
         return None
 
     return myClass

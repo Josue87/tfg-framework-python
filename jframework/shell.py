@@ -83,7 +83,7 @@ class Shell():
                 terminal(my_session["session"], my_session["ip"], my_session["type"])
             except:
                 print("✕ Session error... Deleted")
-                self.delete_session(my_session[id])
+                self.delete_session(id)
         else:
             print("Session", id, "not found")
 
@@ -98,9 +98,8 @@ class Shell():
             try:
                 my_session["session"].close()
             except:
-                print("The session was closed ")
-                return
-            print("Close session", id)
+                pass
+            print("the session {} was closed".format(id))
         else:
             print("Session", id, "not found")
 
@@ -193,6 +192,7 @@ class Shell():
                         self.completer.extend_completer(["put", "run", "conf", "help"])
                     elif (op[0] == "session"):
                         self.start_session(op[1])
+                        readline.set_completer(self.completer.complete)
                     elif (op[0] == "delete_session"):
                         self.delete_session(op[1])
                     else:

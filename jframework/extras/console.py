@@ -1,3 +1,8 @@
+from jframework.extras.autocomplete import MyCompleter
+import readline
+
+
+
 def terminal(client, prompt, type):
     if(type == "ssh"):
         terminal_ssh(client, prompt)
@@ -7,6 +12,8 @@ def terminal(client, prompt, type):
         print("No terminal")
 
 def terminal_ssh(client, prompt):
+    completer = MyCompleter(["scp", "whoami", "cd", "ls", "exit" ], None)
+    readline.set_completer(completer.complete)
     print("You are in a ssh session")
     command = ""
     while command.lower().strip(" ") != "exit":
@@ -19,9 +26,9 @@ def terminal_ssh(client, prompt):
         for line in data:
             print(line, end="")
 
-
-
 def terminal_ftp(client, prompt):
+    completer = MyCompleter(["cwd", "dir","pwd", "exit"], None)
+    readline.set_completer(completer.complete)
     print("You are in a ftp session")
     command = ""
     while command.lower().strip(" ") != "exit":
@@ -29,7 +36,7 @@ def terminal_ftp(client, prompt):
         if("exit" in command.lower()):
             return
         try:
-            c = command.split(" ")
+            c = command.strip(" ").split(" ")
             if(c[1:]):
                 parameter = ""
                 for par in c[1:]:
