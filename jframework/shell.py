@@ -45,8 +45,8 @@ class Shell():
         for root, dirs, files in os.walk('jframework/modules'):
             for file in files:
                 if ".py" == file[-3:] and file != "model.py" and file[0] != "_":
-                    path = root.split("/")[-1]
-                    print(path + "/" + file)
+                    path = root.split("/")[2:]
+                    print('/'.join(path) + "/" + file.split(".py")[0])
 
     def list_sessions(self):
         if(len(self.sessions)):
@@ -54,7 +54,7 @@ class Shell():
             print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format("ID","HOST","User", "Type"))
             print(chr(27) + "[0m")
             for s in self.sessions:
-                print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format(str(s["id"]), s["ip"] , s["user"], s['type']))
+                print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format(s["id"]), s["ip"] , s["user"], s['type'])
             print("")
         else:
             print("There are no sessions")
@@ -74,7 +74,7 @@ class Shell():
         my_session = None
         i = 0
         for s in self.sessions:
-            if(str(s["id"]) == id):
+            if(s["id"] == id):
                 my_session = s
                 break
             i += 1
@@ -90,7 +90,7 @@ class Shell():
     def delete_session(self, id):
         my_session = None
         for s in self.sessions:
-            if (str(s["id"]) == id):
+            if (s["id"] == id):
                 my_session = s
                 break
         if (my_session is not None):
@@ -137,21 +137,25 @@ class Shell():
         self.initial()
         operation = ""
         self.draw_init()
-        while operation != "exit":
+        while True:
             if (self.myModule is None):
                 operation = input(self.prompt())
             else:
                 operation = input(self.prompt(self.nameModule.split("/")[1]))
-            operation = operation.lower().strip()
-            self.exec_command(operation)
+            op = operation.lower().strip()
+            op = self.strip_own(op)
+            if (len(op) == 0):
+                continue
+            if(op[0] == "exit"):
+                break
+            self.exec_command(op)
+
         self.close_sessions()
         print("[*] The tool has been closed.")
 
     def first_exec(self,op):
         result = True
-        if (len(op) == 0 or op[0] == "exit"):
-            result = False
-        elif (op[0] == "modules"):
+        if (op[0] == "modules"):
             self.listModules()
             result = False
         elif (op[0] == "show_sessions"):
@@ -163,9 +167,7 @@ class Shell():
 
         return result
 
-    def exec_command(self, operation):
-        op = self.strip_own(operation)
-
+    def exec_command(self, op):
         if (self.first_exec(op) and op[0] != ''):
 
             if (op[0] != 'load' and op[0] != "session" and
@@ -256,8 +258,6 @@ class Shell():
                     pass
                 return True
         return False
-
-
 
     def get_id_session(self):
         id = 1

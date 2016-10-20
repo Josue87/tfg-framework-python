@@ -1,3 +1,5 @@
+# CVE-2016-6210
+
 from jframework.modules.model import Module
 import time
 hasParamiko = True

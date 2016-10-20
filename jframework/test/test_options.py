@@ -31,3 +31,6 @@ class TestOptions(unittest.TestCase):
 
 def set_ip(shell, host):
     shell.HOST = host
+
+if __name__ == "__main__":
+    unittest.main()
