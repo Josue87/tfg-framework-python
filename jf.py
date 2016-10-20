@@ -2,6 +2,7 @@ from jframework.shell import Shell
 from sys import exit
 from os import _exit
 
+
 if __name__ == "__main__":
     try:
         Shell().start()
