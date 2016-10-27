@@ -2,14 +2,13 @@ import abc
 import re
 import socket
 import jframework.extras.writeformat as wf
-import sys
 
 
 #Basic module
 class Module(metaclass=abc.ABCMeta):
 
     def __init__(self):
-        self.HOST = "127.0.0.1"
+        self.host = "127.0.0.1"
 
     @abc.abstractmethod
     def run(self):
@@ -19,16 +18,11 @@ class Module(metaclass=abc.ABCMeta):
         return ["ip"]
 
     def help(self):
-        print("--- Operations allowed ---")
-        print("load module -> Load the module to use")
-        print("help -> Show the help")
-        print("set <option> <parameter> -> Set the options")
+        print("")
+        print("______   MODULE   _______")
+        print("back -> Remove loaded module")
+        print("put <option> <parameter> -> Set the options")
         print("conf -> Show configuration")
-        print("modules -> List all modules availables")
-        print("show_sessions -> List the open sessions")
-        print("session <id> -> Select session")
-        print("delete_session <id> -> Remove session")
-        print("exit -> Exit tool")
 
     def ip(self, dir):
         dir2 = ""
@@ -41,13 +35,13 @@ class Module(metaclass=abc.ABCMeta):
             print("✕ IP address is invalid")
         else:
             print("IP settings: " + str(dir2))
-            self.HOST = dir2
+            self.host = dir2
 
     def conf(self):
         print("--- Configuration ---")
         wf.printf("OPTION", "VALUE", "DESCRIPTION", "REQUIRED")
         wf.printf("------", "-----", "-----------", "--------")
-        wf.printf("ip", self.HOST, "IP target")
+        wf.printf("ip", self.host, "IP target")
 
 
 # Module whit ports configuration
@@ -55,7 +49,7 @@ class ModulePorts(Module, metaclass=abc.ABCMeta):
 
     def __init__(self):
         super(ModulePorts, self).__init__()
-        self.PORTS = [80]
+        self.ports_list = [80]
 
     def get_options(self):
         options = super(ModulePorts,self).get_options()
@@ -66,23 +60,23 @@ class ModulePorts(Module, metaclass=abc.ABCMeta):
         print("Port/s setting: " + str(p))
         listaP = p.split(",")
         for i in range(0, len(listaP)):
-            listaP[i] = int(listaP[i].strip(" "))
             try:
+                listaP[i] = int(listaP[i].strip(" "))
                 if(int(listaP[i]) <= 0 or int(listaP[i]) > 65535):
                     raise Exception()
             except:
                 print("✕ Error configuring ports")
                 return
-        self.PORTS = listaP
+        self.ports_list = listaP
 
     def conf(self):
         super(ModulePorts, self).conf()
         ports = ""
         i = 0
-        for p in self.PORTS:
+        for p in self.ports_list:
             ports += str(p)
             i += 1
-            if(len(self.PORTS) <= i):
+            if(len(self.ports_list) <= i):
                 break
             ports += ","
 

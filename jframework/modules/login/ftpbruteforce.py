@@ -8,7 +8,7 @@ class Ftpbruteforce(_Bruteforce):
     def worker(self, user, password):
 
         ftp = ftplib.FTP()
-        ftp.connect(self.HOST, timeout=7)
+        ftp.connect(self.host, timeout=7)
         try:
             ftp.login(user, password)
             self.print_result(user, password, error=False)
@@ -28,9 +28,9 @@ class Ftpbruteforce(_Bruteforce):
     def run(self):
         ftp = ftplib.FTP()
         try:
-            ftp.connect(self.HOST, timeout=7)
+            ftp.connect(self.host, timeout=7)
         except:
-            print("{} Connection problem.".format(self.HOST))
+            print("{} Connection problem.".format(self.host))
             return None, None
         ftp.close()
 

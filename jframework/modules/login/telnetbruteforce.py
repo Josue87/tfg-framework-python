@@ -7,7 +7,7 @@ class Telnetbruteforce(_Bruteforce):
 
     def worker(self, user, password):
         try:
-            tn = telnetlib.Telnet(self.HOST, 23, 2)
+            tn = telnetlib.Telnet(self.host, 23, 2)
             tn.read_until((b"login: " or b"Login: " ))
             tn.write(user.encode("ascii") + b"\n")
             tn.read_until((b"Password: " or b"password: "))
@@ -32,7 +32,7 @@ class Telnetbruteforce(_Bruteforce):
 
     def run(self):
         try:
-            tn = telnetlib.Telnet(self.HOST,timeout=3)
+            tn = telnetlib.Telnet(self.host, timeout=3)
             resp = tn.expect([b"login: ", b"Login: "], 3)
             tn.close()
             if resp[1] is None:

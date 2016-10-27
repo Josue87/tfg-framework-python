@@ -19,10 +19,10 @@ class Ackscan(ModulePorts):
             print(resp)
             return
 
-        for port in self.PORTS:
+        for port in self.ports_list:
             port = int(port)
             port_src = RandShort()
-            packet_ip = IP(dst=self.HOST)
+            packet_ip = IP(dst=self.host)
             packet = packet_ip / TCP(sport=port_src, dport=port, flags="A")
             response = sr1(packet, timeout=2)
             if("NoneType" in str(type(response))):

@@ -9,13 +9,13 @@ class ScanTest(unittest.TestCase):
         self.ack_scan = Ackscan()
 
     def test_default_value_syn(self):
-        self.assertEqual(self.syn_scan.HOST, "127.0.0.1")
-        self.assertEqual(self.syn_scan.PORTS, [80])
+        self.assertEqual(self.syn_scan.host, "127.0.0.1")
+        self.assertEqual(self.syn_scan.ports_list, [80])
 
     def test_default_value_ack(self):
-        self.assertEqual(self.ack_scan.HOST, "127.0.0.1")
-        self.assertEqual(self.ack_scan.PORTS, [80])
-        self.assertIsNotNone(self.ack_scan.PORTS)
+        self.assertEqual(self.ack_scan.host, "127.0.0.1")
+        self.assertEqual(self.ack_scan.ports_list, [80])
+        self.assertIsNotNone(self.ack_scan.ports_list)
 
 
 if __name__ == '__main__':

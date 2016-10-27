@@ -9,8 +9,15 @@ class MyCompleter():
         self.COMMANDS = commands
         self.shell = s
 
-    def extend_completer(self,options):
+    def extend_completer(self, options):
         self.COMMANDS.extend(options)
+
+    def remove_options(self, options):
+        for option in options:
+            try:
+                self.COMMANDS.remove(option)
+            except:
+                pass
 
     def _list_directories(self, root, route):
         my_list = []

@@ -41,7 +41,7 @@ class Openssh(Module):
             time1 = time.clock()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             try:
-                client.connect(self.HOST, username=line, password=(26000 * 'J'), timeout=2)
+                client.connect(self.host, username=line, password=(26000 * 'J'), timeout=2)
             except Exception as e:
                 elements = ["timed out", "is not subscriptable" ]
 

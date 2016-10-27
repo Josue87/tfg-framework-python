@@ -81,11 +81,11 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
 
     def users(self, u):
         self.userFile = u
-        print("Users =>", u)
+        print("Users:", u)
 
     def passwords(self, p):
         self.passwordFile = p
-        print("Passwords =>", p)
+        print("Passwords:", p)
 
     def threads(self,number):
         try:
@@ -108,10 +108,10 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
         print("Verbose =>", self.verb)
 
     def add_credential(self, user, password, type):
-        self.credentials.append({"ip": self.HOST, "user": user, "password": password, "type": type})
+        self.credentials.append({"ip": self.host, "user": user, "password": password, "type": type})
 
     def add_session(self, session, user, type):
-        self.sessions.append({"id": 0, "ip": self.HOST, "session": session, "user": user, "type": type})
+        self.sessions.append({"id": 0, "ip": self.host, "session": session, "user": user, "type": type})
 
     def help(self):
         super(_Bruteforce, self).help()

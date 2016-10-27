@@ -12,7 +12,7 @@ class Httpbruteforce(_Bruteforce):
 
     def get_realm(self):
         try:
-            conn = http.client.HTTPConnection(self.HOST)
+            conn = http.client.HTTPConnection(self.host)
             conn.request("GET", "/")
             res = conn.getresponse()
             realm = res.getheader("WWW-Authenticate").split("=")[1].strip("\"")
@@ -27,12 +27,12 @@ class Httpbruteforce(_Bruteforce):
         try:
             auth_handler = ur.HTTPBasicAuthHandler()
             auth_handler.add_password(realm=self.realm_router,
-                                      uri=self.HOST,
+                                      uri=self.host,
                                       user=user,
                                       passwd=password)
             opener = ur.build_opener(auth_handler)
             ur.install_opener(opener)
-            pag = ur.urlopen("http://" + str(self.HOST))
+            pag = ur.urlopen("http://" + str(self.host))
             if (pag.getcode() == 200):
                 self.print_result(user, password, error=False)
                 self.lock.acquire()
