@@ -4,21 +4,24 @@ from jframework.extras.check_scapy import check
 
 
 
-class test_check_scapy(unittest.TestCase):
+class Test_check_scapy(unittest.TestCase):
+
+    def __init__(self, *args, **kwargs):
+        super(Test_check_scapy, self).__init__(*args, **kwargs)
+        try:
+            from scapy.all import TCP
+            self.exist_scapy = True
+        except:
+            self.exist_scapy = False
 
     def setUp(self):
         self.result = check()
 
     def test_sudo(self):
-        if os.getuid() != 0:
-            self.assertEquals(self.result,"This task requires root")
+        if self.exist_scapy:
+            if os.getuid() != 0:
+                self.assertEquals(self.result,"This task requires root")
+            else:
+                self.assertNotEqual(self.result, "ok")
         else:
-            self.assertNotEqual(self.result, "ok")
-
-    def test_scapy(self):
-        try:
-            from scapy.all import TCP
-            self.assertNotEqual(self.result, "It's required install scapy module")
-        except:
             self.assertEqual(self.result, "It's required install scapy module")
-
