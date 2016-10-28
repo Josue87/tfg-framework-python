@@ -47,7 +47,8 @@ class Shell():
         print(str(module) + " loaded correctly")
 
         self.nameModule = module
-        self.completer.extend_completer(self._options_module)
+        if(self.completer):
+            self.completer.extend_completer(self._options_module)
 
         return module_load
 
@@ -61,7 +62,7 @@ class Shell():
     def list_sessions(self):
         if(len(self.sessions)):
             print(chr(27) + "[1;34m")
-            print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format("ID","HOST","User", "Type"))
+            print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format("ID", "HOST", "User", "Type"))
             print(chr(27) + "[0m")
             for s in self.sessions:
                 print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format(s["id"]), s["ip"] , s["user"], s['type'])
@@ -72,10 +73,10 @@ class Shell():
     def list_credentials(self):
         if(len(self.credentials)):
             print(chr(27) + "[1;34m")
-            print("{:16}\t{:20}\t\t{:8}".format("HOST","User:Password", "Type"))
+            print("{:16}\t{:20}\t\t{:8}".format("HOST", "User:Password", "Type"))
             print(chr(27) + "[0m")
             for c in self.credentials:
-                print("{:16}\t{:20}\t\t{:8}".format(c["ip"], c["user"]+":"+c["password"], c['type'] ))
+                print("{:16}\t{:20}\t\t{:8}".format(c["ip"], c["user"] + ":" + c["password"], c['type'] ))
             print("")
         else:
             print("There are not credentials yet")
@@ -113,7 +114,8 @@ class Shell():
         else:
             print("Session", id, "not found")
 
-    def draw_init(self):
+    @staticmethod
+    def draw_init():
          print("""
          %%%%                %%%%
          %%%%%              %%%%%
@@ -198,11 +200,11 @@ class Shell():
 
     def first_exec(self,op):
         aux = {
-            "modules":self.listModules,
-            "show_sessions":self.list_sessions,
-            "credentials":self.list_credentials,
-            "back":self.remove_module,
-            "help":self.help
+            "modules" : self.listModules,
+            "show_sessions" : self.list_sessions,
+            "credentials" : self.list_credentials,
+            "back" : self.remove_module,
+            "help" : self.help
         }
 
         aux2 = {
@@ -237,7 +239,8 @@ class Shell():
         except:
             pass
 
-    def strip_own(self, line):
+    @staticmethod
+    def strip_own(line):
         mylist = line.split(" ")
         while "" in mylist:
             mylist.remove("")
@@ -246,7 +249,6 @@ class Shell():
     def close_sessions(self):
         if(len(self.sessions) == 0):
             return
-        i = 0
         for s in self.sessions:
             try:
                 s["session"].close()
@@ -272,7 +274,8 @@ class Shell():
                 continue
             self.credentials.append(credential)
 
-    def exist_in_list(self,origin_list, element):
+    @staticmethod
+    def exist_in_list(origin_list, element):
         for el in origin_list:
             if el["user"] == element["user"] and el["type"] == element["type"] and el["ip"] == element["ip"]:
                 try:

@@ -1,8 +1,6 @@
 import unittest
+from jframework.extras.load import loadModule
 import sys
-sys.path.append("../../jframework")
-sys.path.append("../extras")
-from load import loadModule
 
 
 class LoadTest(unittest.TestCase):
@@ -31,7 +29,6 @@ class LoadTest(unittest.TestCase):
         sys.path.append("../modules/login")
         module = loadModule("login/noexist")
         self.assertIsNone(module)
-
 
 if __name__ == '__main__':
     unittest.main()
