@@ -153,8 +153,9 @@ class Shell():
                 operation = input(self.prompt())
             else:
                 operation = input(self.prompt(self.nameModule.split("/")[1]))
-            op = operation.lower().strip()
+            op = operation.strip()
             op = self.strip_own(op)
+            op[0] = op[0].lower()
             if (len(op) == 0):
                 continue
             if(op[0] == "exit"):
@@ -185,7 +186,7 @@ class Shell():
                     else:
                         if (op[0] == "put"):
                             if (len(op) >= 3):
-                                getattr(self.myModule, op[1])(op[2])
+                                getattr(self.myModule, op[1].lower())(op[2])
                             else:
                                 print("Parameter no found")
                                 return
