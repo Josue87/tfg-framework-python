@@ -41,7 +41,6 @@ class _Bruteforce(Module, metaclass=abc.ABCMeta):
         return users, passwords
 
     def run(self):
-        super(_Bruteforce, self).run()
         try:
           users, passwords = self.read_files()
         except:

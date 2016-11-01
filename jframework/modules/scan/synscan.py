@@ -10,12 +10,9 @@ except:
     pass
 
 
-
 class Synscan(ModulePorts):
 
     def run(self):
-        super(Synscan, self).run()
-
         resp = check()
         if(resp != "ok"):
             print(resp)

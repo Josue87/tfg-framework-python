@@ -9,11 +9,10 @@ try:
 except:
     pass
 
+
 class Ackscan(ModulePorts):
 
     def run(self):
-        super(Ackscan, self).run()
-
         resp = check()
         if (resp != "ok"):
             print(resp)

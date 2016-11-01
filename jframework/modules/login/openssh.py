@@ -27,7 +27,6 @@ class Openssh(Module):
         print("userFile: " + str(self.userFile))
 
     def run(self):
-        super(Openssh, self).run()
         if(not hasParamiko):
             print("It's required install paramiko module")
             return

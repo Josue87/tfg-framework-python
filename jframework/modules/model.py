@@ -12,7 +12,7 @@ class Module(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def run(self):
-        print("Work in progress")
+        pass
 
     def get_options(self):
         return ["ip"]
@@ -57,13 +57,16 @@ class ModulePorts(Module, metaclass=abc.ABCMeta):
         return options
 
     def ports(self, p):
-        print("Port/s setting: " + str(p))
+        print("Port/s setting: " + p)
         listaP = p.split(",")
         for i in range(0, len(listaP)):
             try:
-                listaP[i] = int(listaP[i].strip(" "))
-                if(int(listaP[i]) <= 0 or int(listaP[i]) > 65535):
-                    raise Exception()
+                if listaP[i] != "":
+                    listaP[i] = int(listaP[i].strip())
+                    if(int(listaP[i]) <= 0 or int(listaP[i]) > 65535):
+                        raise Exception()
+                else:
+                    del listaP[i]
             except:
                 print("✕ Error configuring ports")
                 return

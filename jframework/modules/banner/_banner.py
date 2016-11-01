@@ -51,7 +51,6 @@ class _Banner(Module, metaclass=abc.ABCMeta):
         pass
 
     def run(self):
-        super(_Banner, self).run()
         banner = self.check()
         if(banner is None):
             return
@@ -77,6 +76,3 @@ class _Banner(Module, metaclass=abc.ABCMeta):
                 print("No vulnerabilities found")
         else:
             print("Service: "+str(banner))
-
-
-
