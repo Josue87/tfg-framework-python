@@ -65,7 +65,7 @@ class Shell():
             print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format("ID", "HOST", "User", "Type"))
             print(chr(27) + "[0m")
             for s in self.sessions:
-                print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format(s["id"]), s["ip"] , s["user"], s['type'])
+                print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format(s["id"], s["ip"] , s["user"], s["type"]))
             print("")
         else:
             print("There are no sessions")
@@ -83,12 +83,14 @@ class Shell():
 
     def start_session(self, id):
         my_session = None
-        i = 0
+
         for s in self.sessions:
-            if(s["id"] == id):
+
+            if(str(s["id"]) == str(id)):
                 my_session = s
                 break
-            i += 1
+
+        print(my_session)
         if(my_session is not None):
             try:
                 terminal(my_session["session"], my_session["ip"], my_session["type"])
@@ -167,7 +169,6 @@ class Shell():
 
     def exec_command(self, op):
         if (self.first_exec(op) and op[0] != ''):
-
             if (op[0] != 'load' and op[0] != "session" and
                         op[0] != "delete_session" and self.myModule is None):
                 print("⚠ To show the modules availables you should use: modules")

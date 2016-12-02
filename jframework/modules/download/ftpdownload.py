@@ -39,7 +39,7 @@ class Ftpdownload(Module):
             password = input("Password: ")
             ftp = ftplib.FTP()
             try:
-                ftp.connect("192.168.0.194", timeout=7)
+                ftp.connect(self.host, timeout=7)
                 ftp.login(user, password)
                 print("SUCCESS: " + str(user) + ":" + str(password))
                 out = True
