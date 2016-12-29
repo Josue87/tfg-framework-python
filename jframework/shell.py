@@ -2,18 +2,17 @@ import os
 from jframework.extras.load import loadModule
 from jframework.extras.exceptions import MyError
 from jframework.extras.autocomplete import MyCompleter
-from jframework.extras.console import terminal
 import readline
 from jframework.extras.record import start_record
+from jframework.extras.sessions_credentials import Session, Credential
 
 
 class Shell():
 
     def __init__(self):
         self.myModule = None
-        self.nameModule = None
-        self.sessions = []
-        self.credentials = []
+        self.session = Session()
+        self.credential = Credential()
         self._options_module = ["put", "run", "conf", "back"]
         self._options_start = ["exit", "load", "modules", "show_sessions",
                                "session", "delete_session", "credentials", "help"]
@@ -58,63 +57,6 @@ class Shell():
                 if ".py" == file[-3:] and file != "model.py" and file[0] != "_":
                     path = root.split("/")[2:]
                     print('/'.join(path) + "/" + file.split(".py")[0])
-
-    def list_sessions(self):
-        if(len(self.sessions)):
-            print(chr(27) + "[1;34m")
-            print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format("ID", "HOST", "User", "Type"))
-            print(chr(27) + "[0m")
-            for s in self.sessions:
-                print("{:5}\t{:16}\t\t{:9}\t\t{:8}".format(s["id"], s["ip"] , s["user"], s["type"]))
-            print("")
-        else:
-            print("There are no sessions")
-
-    def list_credentials(self):
-        if(len(self.credentials)):
-            print(chr(27) + "[1;34m")
-            print("{:16}\t{:20}\t\t{:8}".format("HOST", "User:Password", "Type"))
-            print(chr(27) + "[0m")
-            for c in self.credentials:
-                print("{:16}\t{:20}\t\t{:8}".format(c["ip"], c["user"] + ":" + c["password"], c['type'] ))
-            print("")
-        else:
-            print("There are not credentials yet")
-
-    def start_session(self, id):
-        my_session = None
-
-        for s in self.sessions:
-
-            if(str(s["id"]) == str(id)):
-                my_session = s
-                break
-
-        print(my_session)
-        if(my_session is not None):
-            try:
-                terminal(my_session["session"], my_session["ip"], my_session["type"])
-            except:
-                print("✕ Session error... Deleted")
-                self.delete_session(id)
-        else:
-            print("Session", id, "not found")
-
-    def delete_session(self, id):
-        my_session = None
-        for s in self.sessions:
-            if (s["id"] == id):
-                my_session = s
-                break
-        if (my_session is not None):
-            self.sessions.remove(my_session)
-            try:
-                my_session["session"].close()
-            except:
-                pass
-            print("the session {} was closed".format(id))
-        else:
-            print("Session", id, "not found")
 
     @staticmethod
     def draw_init():
@@ -164,7 +106,7 @@ class Shell():
                 break
             self.exec_command(op)
 
-        self.close_sessions()
+        self.session.close_sessions()
         print("[*] The tool has been closed.")
 
     def exec_command(self, op):
@@ -203,15 +145,15 @@ class Shell():
     def first_exec(self,op):
         aux = {
             "modules" : self.listModules,
-            "show_sessions" : self.list_sessions,
-            "credentials" : self.list_credentials,
+            "show_sessions" : self.session.list_sessions,
+            "credentials" : self.credential.list_credentials,
             "back" : self.remove_module,
             "help" : self.help
         }
 
         aux2 = {
-            "session":self.start_session,
-            "delete_session":self.delete_session
+            "session":self.session.start_session,
+            "delete_session":self.session.delete_session
         }
 
         try:
@@ -236,7 +178,7 @@ class Shell():
     def run_module(self):
         try:
             res_s, res_c = self.myModule.run()
-            self.return_result_session(res_s)
+            self.session.return_result_session(res_s)
             self.return_result_credential(res_c)
         except:
             pass
@@ -247,50 +189,3 @@ class Shell():
         while "" in mylist:
             mylist.remove("")
         return mylist
-
-    def close_sessions(self):
-        if(len(self.sessions) == 0):
-            return
-        for s in self.sessions:
-            try:
-                s["session"].close()
-            except:
-                pass
-
-    def return_result_session(self, res):
-        if res is None or len(res) == 0:
-            return
-
-        for session in res:
-            if(self.exist_in_list(self.sessions, session)):
-                continue
-            session["id"] = self.get_id_session()
-            self.sessions.append(session)
-
-    def return_result_credential(self, res):
-        if res is None or len(res) == 0:
-            return
-
-        for credential in res:
-            if (self.exist_in_list(self.credentials, credential)):
-                continue
-            self.credentials.append(credential)
-
-    @staticmethod
-    def exist_in_list(origin_list, element):
-        for el in origin_list:
-            if el["user"] == element["user"] and el["type"] == element["type"] and el["ip"] == element["ip"]:
-                try:
-                    if(element["session"]):
-                        element["session"].close()
-                except:
-                    pass
-                return True
-        return False
-
-    def get_id_session(self):
-        id = 1
-        for s in self.sessions:
-            if(s["id"] >= id):
-                id = s["id"] + 1
-        return id

@@ -1,9 +1,9 @@
-from jframework.modules.model import Module
+from jframework.modules.model import ModuleSinglePort
 import jframework.extras.writeformat as wf
 import os
 import abc
 
-class _Banner(Module, metaclass=abc.ABCMeta):
+class _Banner(ModuleSinglePort, metaclass=abc.ABCMeta):
 
     def __init__(self):
         super(_Banner, self).__init__()

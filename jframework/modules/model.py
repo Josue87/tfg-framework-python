@@ -43,6 +43,30 @@ class Module(metaclass=abc.ABCMeta):
         wf.printf("------", "-----", "-----------", "--------")
         wf.printf("ip", self.host, "IP target")
 
+class ModuleSinglePort(Module, metaclass=abc.ABCMeta):
+    def __init__(self):
+        super(ModuleSinglePort, self).__init__()
+        self.single_port = 80  # Las que requieran puerto 80 por defecto, no necesitarán llamar a __init__
+
+    def get_options(self):
+        options = super(ModuleSinglePort, self).get_options()
+        options.append("port")
+        return options
+
+    def port(self, p):
+        print("Port setting: " + p)
+        try:
+            if (int(p) <= 0 or int(p) > 65535):
+                raise Exception()
+            else:
+                self.single_port = p
+        except:
+            print("✕ Error configuring port")
+
+    def conf(self):
+        super(ModuleSinglePort, self).conf()
+        wf.printf("port", str(self.single_port), "Port configuration")
+
 
 # Module whit ports configuration
 class ModulePorts(Module, metaclass=abc.ABCMeta):

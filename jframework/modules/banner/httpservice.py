@@ -6,7 +6,7 @@ class Httpservice(_Banner):
 
     def check(self):
         try:
-            http = HTTPConnection(self.host, timeout=2)
+            http = HTTPConnection(host=self.host, port=self.single_port, timeout=2)
             http.request("HEAD", "/")
             server = http.getresponse().getheader('server')
             return server

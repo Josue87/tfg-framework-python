@@ -5,10 +5,14 @@ import sys
 
 class Ftpbruteforce(_Bruteforce):
 
+    def __init__(self):
+        super(Ftpbruteforce,self).__init__()
+        self.single_port = 21
+
     def worker(self, user, password):
 
         ftp = ftplib.FTP()
-        ftp.connect(self.host, timeout=7)
+        ftp.connect(host=self.host, port=self.single_port, timeout=7)
         try:
             ftp.login(user, password)
             self.print_result(user, password, error=False)
@@ -28,7 +32,7 @@ class Ftpbruteforce(_Bruteforce):
     def run(self):
         ftp = ftplib.FTP()
         try:
-            ftp.connect(self.host, timeout=7)
+            ftp.connect(host=self.host, port=self.single_port, timeout=7)
         except:
             print("{} Connection problem.".format(self.host))
             return None, None

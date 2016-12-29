@@ -5,9 +5,13 @@ import telnetlib
 
 class Telnetbruteforce(_Bruteforce):
 
+    def __init__(self):
+        super(Telnetbruteforce, self).__init__()
+        self.single_port = 23
+
     def worker(self, user, password):
         try:
-            tn = telnetlib.Telnet(self.host, 23, 2)
+            tn = telnetlib.Telnet(host=self.host, port=self.single_port, timeout=2)
             tn.read_until((b"login: " or b"Login: " ))
             tn.write(user.encode("ascii") + b"\n")
             tn.read_until((b"Password: " or b"password: "))
@@ -32,7 +36,7 @@ class Telnetbruteforce(_Bruteforce):
 
     def run(self):
         try:
-            tn = telnetlib.Telnet(self.host, timeout=3)
+            tn = telnetlib.Telnet(host=self.host, port=self.single_port, timeout=3)
             resp = tn.expect([b"login: ", b"Login: "], 3)
             tn.close()
             if resp[1] is None:

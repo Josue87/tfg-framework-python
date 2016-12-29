@@ -22,7 +22,7 @@ class Httpbruteforce(_Bruteforce):
 
     def get_realm(self):
         try:
-            conn = http.client.HTTPConnection(self.host, timeout=3)
+            conn = http.client.HTTPConnection(host=self.host, port=self.single_port, timeout=3)
             conn.request("GET", self.resource_http)
             res = conn.getresponse()
             realm = res.getheader("WWW-Authenticate").split("=")[1].strip("\"")

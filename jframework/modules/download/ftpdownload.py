@@ -1,13 +1,14 @@
 import ftplib
-from jframework.modules.model import Module
+from jframework.modules.model import ModuleSinglePort
 import jframework.extras.writeformat as wf
 
-class Ftpdownload(Module):
+class Ftpdownload(ModuleSinglePort):
 
     def __init__(self):
         super(Ftpdownload,self).__init__()
         self.name_search = "passwords"
         self.dir_root = "/home"
+        self.single_port = 21
 
     def help(self):
         super(Ftpdownload, self).help()
@@ -39,7 +40,7 @@ class Ftpdownload(Module):
             password = input("Password: ")
             ftp = ftplib.FTP()
             try:
-                ftp.connect(self.host, timeout=7)
+                ftp.connect(host=self.host, port=self.single_port, timeout=7)
                 ftp.login(user, password)
                 print("SUCCESS: " + str(user) + ":" + str(password))
                 out = True

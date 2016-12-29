@@ -1,10 +1,10 @@
-from jframework.modules.model import Module
+from jframework.modules.model import ModuleSinglePort
 import jframework.extras.writeformat as wf
 import abc
 import threading
 
 
-class _Bruteforce(Module, metaclass=abc.ABCMeta):
+class _Bruteforce(ModuleSinglePort, metaclass=abc.ABCMeta):
 
     def __init__(self):
         super(_Bruteforce,self).__init__()
