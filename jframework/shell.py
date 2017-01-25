@@ -1,8 +1,9 @@
 import os
+from sys import exit
+import readline
 from jframework.extras.load import loadModule
 from jframework.extras.exceptions import MyError
 from jframework.extras.autocomplete import MyCompleter
-import readline
 from jframework.extras.record import start_record
 from jframework.extras.sessions_credentials import Session, Credential
 
@@ -99,15 +100,17 @@ class Shell():
                 operation = input(self.prompt(self.nameModule.split("/")[1]))
             op = operation.strip()
             op = self.strip_own(op)
-            op[0] = op[0].lower()
             if (len(op) == 0):
                 continue
+
+            op[0] = op[0].lower()
             if(op[0] == "exit"):
                 break
             self.exec_command(op)
 
         self.session.close_sessions()
         print("[*] The tool has been closed.")
+        exit(0)
 
     def exec_command(self, op):
         if (self.first_exec(op) and op[0] != ''):
@@ -179,7 +182,7 @@ class Shell():
         try:
             res_s, res_c = self.myModule.run()
             self.session.return_result_session(res_s)
-            self.return_result_credential(res_c)
+            self.credential.return_result_credential(res_c)
         except:
             pass
 

@@ -9,25 +9,25 @@ class Ftpbruteforce(_Bruteforce):
         super(Ftpbruteforce,self).__init__()
         self.single_port = 21
 
-    def worker(self, user, password):
+    def worker(self):
 
         ftp = ftplib.FTP()
         ftp.connect(host=self.host, port=self.single_port, timeout=7)
-        try:
-            ftp.login(user, password)
-            self.print_result(user, password, error=False)
-            self.lock.acquire()
-            self.add_credential(user, password, "ftp")
-            self.add_session(ftp, user, "ftp")
-            self.lock.release()
-        except Exception as e:
-            if self.verb:
-                self.print_result(user, password, error=True)
+        while(not self.tasks_queue.empty()):
+            task = self.tasks_queue.get()
+            if task is None:
+                break
+            try:
+                ftp.login(task["user"], task["password"])
+                self.print_result(task["user"], task["password"], error=False)
+                self.add_credential(task["user"], task["password"], "ftp")
+                self.add_session(ftp, task["user"], "ftp")
+            except Exception as e:
+                if self.verb:
+                    self.print_result(task["user"], task["password"], error=True)
+                ftp.close()
 
-            ftp.close()
-
-        self.num_threads -= 1
-        sys.exit(0)
+            self.tasks_queue.task_done()
 
     def run(self):
         ftp = ftplib.FTP()
@@ -38,6 +38,4 @@ class Ftpbruteforce(_Bruteforce):
             return None, None
         ftp.close()
 
-        super(Ftpbruteforce, self).run()
-
-        return self.sessions, self.credentials
+        return super(Ftpbruteforce, self).run

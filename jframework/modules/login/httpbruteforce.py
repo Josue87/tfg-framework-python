@@ -42,32 +42,30 @@ class Httpbruteforce(_Bruteforce):
         options.extend(["resource"])
         return options
 
-    def worker(self, user, password):
+    def worker(self):
+        while (not self.tasks_queue.empty()):
+            task = self.tasks_queue.get()
+            if task is None:
+                break
+            try:
+                auth_handler = ur.HTTPBasicAuthHandler()
+                auth_handler.add_password(realm=self.realm_router,
+                                          uri=self.host,
+                                          user=task["user"],
+                                          passwd=task["password"])
+                opener = ur.build_opener(auth_handler)
+                ur.install_opener(opener)
+                pag = ur.urlopen("http://" + str(self.host) + self.resource_http)
+                if (pag.getcode() == 200):
+                    self.print_result(task["user"], task["password"], error=False)
+                    self.add_credential(task["user"], task["password"], "http")
+            except Exception as e:
+                if("refused" in str(e)):
+                    break
+                if (self.verb):
+                    self.print_result(task["user"], task["password"], error=True)
 
-        try:
-            auth_handler = ur.HTTPBasicAuthHandler()
-            auth_handler.add_password(realm=self.realm_router,
-                                      uri=self.host,
-                                      user=user,
-                                      passwd=password)
-            opener = ur.build_opener(auth_handler)
-            ur.install_opener(opener)
-            pag = ur.urlopen("http://" + str(self.host) + self.resource_http)
-            if (pag.getcode() == 200):
-                self.print_result(user, password, error=False)
-                self.lock.acquire()
-                self.add_credential(user, password, "http")
-                self.lock.release()
-        except Exception as e:
-            if("refused" in str(e)):
-                self.num_threads -= 1
-                self.error += 1
-                sys.exit(0)
-            if (self.verb):
-                self.print_result(user, password, error=True)
-
-        self.num_threads -= 1
-        sys.exit(0)
+            self.tasks_queue.task_done()
 
     def run(self):
         self.realm_router = self.get_realm()
@@ -80,6 +78,4 @@ class Httpbruteforce(_Bruteforce):
             print("Connection refused")
             return
 
-        super(Httpbruteforce, self).run()
-
-        return self.sessions, self.credentials
+        return super(Httpbruteforce, self).run
