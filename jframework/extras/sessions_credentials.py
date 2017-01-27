@@ -40,7 +40,8 @@ class Session:
 
         if (my_session is not None):
             try:
-                terminal(my_session["session"], my_session["ip"], my_session["type"])
+                terminal(my_session["session"], 
+                        my_session["ip"], my_session["type"])
             except:
                 print("✕ Session error... Deleted")
                 self.delete_session(id)
@@ -63,7 +64,7 @@ class Session:
         else:
             print("Session", id, "not found")
 
-    def return_result_session(self, res):
+    def save_result_session(self, res):
         if res is None or len(res) == 0:
             return
 
@@ -100,12 +101,13 @@ class Credential:
             print("{:16}\t{:20}\t\t{:8}".format("HOST", "User:Password", "Type"))
             print(chr(27) + "[0m")
             for c in self.credentials:
-                print("{:16}\t{:20}\t\t{:8}".format(c["ip"], c["user"] + ":" + c["password"], c['type'] ))
+                print("{:16}\t{:20}\t\t{:8}".format(c["ip"], c["user"] + ":"
+                     + c["password"], c['type'] ))
             print("")
         else:
             print("There are not credentials yet")
 
-    def return_result_credential(self, res):
+    def save_result_credential(self, res):
         if res is None or len(res) == 0:
             return
 

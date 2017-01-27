@@ -181,8 +181,8 @@ class Shell():
     def run_module(self):
         try:
             res_s, res_c = self.myModule.run()
-            self.session.return_result_session(res_s)
-            self.credential.return_result_credential(res_c)
+            self.session.save_result_session(res_s)
+            self.credential.save_result_credential(res_c)
         except:
             pass
 

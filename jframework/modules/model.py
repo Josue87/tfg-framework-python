@@ -21,7 +21,7 @@ class Module(metaclass=abc.ABCMeta):
         print("")
         print("______   MODULE   _______")
         print("back -> Remove loaded module")
-        print("put <option> <parameter> -> Set the options")
+        print("put <option> <parameter> -> Set the options (show + info: conf)")
         print("conf -> Show configuration")
 
     def ip(self, dir):
@@ -37,6 +37,7 @@ class Module(metaclass=abc.ABCMeta):
             print("IP settings: " + str(dir2))
             self.host = dir2
 
+    # option required is true by default
     def conf(self):
         print("--- Configuration ---")
         wf.printf("OPTION", "VALUE", "DESCRIPTION", "REQUIRED")
@@ -46,7 +47,7 @@ class Module(metaclass=abc.ABCMeta):
 class ModuleSinglePort(Module, metaclass=abc.ABCMeta):
     def __init__(self):
         super(ModuleSinglePort, self).__init__()
-        self.single_port = 80  # Las que requieran puerto 80 por defecto, no necesitarán llamar a __init__
+        self.single_port = 80  # If a module needs port 80 don't need call __init__ function
 
     def get_options(self):
         options = super(ModuleSinglePort, self).get_options()

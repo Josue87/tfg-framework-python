@@ -51,6 +51,8 @@ class MyCompleter():
         return [path + ' ']
 
     def complete_load(self, args):
+        if(len(args) > 1):
+            return []
         path = os.path.join("jframework", "modules")
         if not args:
             return self._complete_path(route=path)
@@ -61,7 +63,11 @@ class MyCompleter():
         current_module = self.shell.get_module()
         if current_module is not None:
             options = current_module.get_options()
-            my_list = [option + ' ' for option in options if (option.startswith(args[0].strip(" ")) and option != args[0])]
+            my_list = [
+                        option + ' ' for option in options 
+                        if (option.startswith(args[0].strip(" ")) 
+                        and option != args[0])
+                      ]
             return my_list
         return ""
 
