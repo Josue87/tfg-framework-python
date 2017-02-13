@@ -16,8 +16,6 @@ class _Bruteforce(ModuleSinglePort, metaclass=abc.ABCMeta):
         self.num_threads = 0
         self.maxthreads = 4
         self.error = 0
-        self.sessions = []
-        self.credentials = []
         self.sessions_queue = queue.Queue()
         self.credentials_queue = queue.Queue()
         self.tasks_queue = queue.Queue()
@@ -56,7 +54,6 @@ class _Bruteforce(ModuleSinglePort, metaclass=abc.ABCMeta):
                     "password": password
                 }
                 self.tasks_queue.put(line)
-
         try:
             users_file.close()
             passwords_file.close()
@@ -80,7 +77,6 @@ class _Bruteforce(ModuleSinglePort, metaclass=abc.ABCMeta):
             threads.append(th)
             th.start()
 
-
         self.tasks_queue.join()
 
         # stop workers
@@ -90,12 +86,12 @@ class _Bruteforce(ModuleSinglePort, metaclass=abc.ABCMeta):
         for t in threads:
             t.join()
 
-        self.sessions = [session for session in self.sessions_queue.queue]
-        self.credentials = [credentials for credentials in self.credentials_queue.queue]
-        print("Found", len(self.credentials), "logins")
-        print(len(self.sessions), "sessions open")
+        sessions = [session for session in self.sessions_queue.queue]
+        credentials = [credentials for credentials in self.credentials_queue.queue]
+        print("Found", len(credentials), "logins")
+        print(len(sessions), "sessions open")
 
-        return self.sessions, self.credentials
+        return sessions, credentials
 
     def users(self, u):
         self.userFile = u

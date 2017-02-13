@@ -22,7 +22,8 @@ class Sshbruteforce(_Bruteforce):
             if task is None:
                 break
             try:
-                client.connect(hostname=self.host, port=self.single_port, username=task["user"], password=task["password"], banner_timeout=2, timeout=2)
+                client.connect(hostname=self.host, port=self.single_port, username=task["user"], 
+                                password=task["password"], banner_timeout=2, timeout=2)
                 self.print_result(task["user"], task["password"], error=False)
                 self.add_credential(task["user"], task["password"], "ssh")
                 self.add_session(client, task["user"], "ssh")

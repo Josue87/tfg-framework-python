@@ -29,7 +29,7 @@ class MyCompleter():
                 my_list.append(name.split(".py")[0])
         return my_list
 
-    def _complete_path(self, path=None, route="jramework/modules"):
+    def _complete_path(self, path=None, route="jframework/modules"):
         if not path:
             return self._list_directories(".", route)
         directory = os.path.split(path)

