@@ -21,6 +21,7 @@ class Module(metaclass=abc.ABCMeta):
         print("")
         print("______   MODULE   _______")
         print("back -> Remove loaded module")
+        print("run -> Execute the module")
         print("put <option> <parameter> -> Set the options (show + info: conf)")
         print("conf -> Show configuration")
 
