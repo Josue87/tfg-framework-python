@@ -9,11 +9,10 @@ class Ftpbruteforce(_Bruteforce):
         super(Ftpbruteforce,self).__init__()
         self.single_port = 21
 
-    def worker(self):
-
-        ftp = ftplib.FTP()
-        ftp.connect(host=self.host, port=self.single_port, timeout=7)
+    def worker(self):    
         while(not self.tasks_queue.empty()):
+            ftp = ftplib.FTP()
+            ftp.connect(host=self.host, port=self.single_port, timeout=7)
             task = self.tasks_queue.get()
             if task is None:
                 break

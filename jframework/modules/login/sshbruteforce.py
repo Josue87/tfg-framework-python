@@ -15,9 +15,9 @@ class Sshbruteforce(_Bruteforce):
         self.single_port = 22
 
     def worker(self):
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         while(not self.tasks_queue.empty()):
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             task = self.tasks_queue.get()
             if task is None:
                 break

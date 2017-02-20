@@ -35,7 +35,7 @@ class Module(metaclass=abc.ABCMeta):
         if(ipregex.match(dir2) is None):
             print("✕ IP address is invalid")
         else:
-            print("IP settings: " + str(dir2))
+            print("IP => " + str(dir2))
             self.host = dir2
 
     # option required is true by default
@@ -56,7 +56,7 @@ class ModuleSinglePort(Module, metaclass=abc.ABCMeta):
         return options
 
     def port(self, p):
-        print("Port setting: " + p)
+        print("Port =>  " + str(p))
         try:
             if (int(p) <= 0 or int(p) > 65535):
                 raise Exception()
@@ -83,7 +83,7 @@ class ModulePorts(Module, metaclass=abc.ABCMeta):
         return options
 
     def ports(self, p):
-        print("Port/s setting: " + p)
+        print("Ports => " + p)
         listaP = p.split(",")
         for i in range(0, len(listaP)):
             try:

@@ -106,8 +106,8 @@ class _Bruteforce(ModuleSinglePort, metaclass=abc.ABCMeta):
             number = int(number)
         except:
             pass
-        if(number > 10):
-            self.maxthreads = 10
+        if(number > 9):
+            self.maxthreads = 9
         elif(number < 0):
             self.maxthreads = 1
         else:
@@ -129,7 +129,7 @@ class _Bruteforce(ModuleSinglePort, metaclass=abc.ABCMeta):
 
     def help(self):
         super(_Bruteforce, self).help()
-        print("threads <number> -> set the number of threads (1..10)")
+        print("threads <number> -> set the number of threads (1..9)")
         print("users <file_users> -> set the file with the users")
         print("passwords <file_passwords> -> set the file with the passwords")
         print("verbose <YES/NO> -> show info when a module is running")
@@ -143,9 +143,9 @@ class _Bruteforce(ModuleSinglePort, metaclass=abc.ABCMeta):
             pf = pf[-1]
         except Exception as e:
             print(e)
-        wf.printf("users", uf, "File whit the users")
-        wf.printf("passwords", pf, "File whit passwords")
-        wf.printf("threads", str(self.maxthreads), "Number of threads(1..10)", "No")
+        wf.printf("users", uf, "File with the users")
+        wf.printf("passwords", pf, "File with passwords")
+        wf.printf("threads", str(self.maxthreads), "Number of threads(1..9)", "No")
         if(self.verb):
             v = "True"
         else:
