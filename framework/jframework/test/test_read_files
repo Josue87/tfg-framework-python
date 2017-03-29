@@ -1,0 +1,25 @@
+from jframework.modules.login.httpbruteforce import Httpbruteforce
+from jframework.modules.banner.ftpservice import Ftpservice
+import unittest
+
+class ReadTest(unittest.TestCase):
+    def test_read_bruteforce(self):
+        http_brute = Httpbruteforce() #The function is the same for the others (bruteforce)
+        http_brute.users("../files/users.txt")
+        http_brute.passwords("../files/passwords.txt")
+        u,p = http_brute.read_files()
+        self.assertIsNotNone(u)
+        self.assertIsNotNone(p)
+        self.assertIn("root", u)
+        self.assertIn("admin", p)
+
+    def test_read_banner(self):
+        ftp_banner = Ftpservice()
+        ftp_banner.file("../files/vulnerables_ftp.txt") #The function is the same for the others (banner)
+        service, cve = ftp_banner.readFile()
+        self.assertIsNotNone(service)
+        self.assertIsNotNone(cve)
+        self.assertEqual(len(service), len(cve)) # The file must be service:cve
+
+if __name__ == "__main__":
+    unittest.main()
