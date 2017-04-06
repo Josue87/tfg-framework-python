@@ -3,14 +3,25 @@ import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from jframework.modules.model import ModulePorts
 from jframework.extras.check_scapy import check
+from jframework.extras.root import get_root
+
 try:
     from scapy.all import *
     conf.verb = 0
 except:
     pass
 
-
 class Synscan(ModulePorts):
+
+    def __new__(cls, *args, **kwargs):
+        if os.getuid() != 0:
+            # getRoot
+            use = get_root("scan/synscan")
+            if use >= 0:
+                print("Now you don't have root permissions")
+                return -1 # Can't load again
+
+        return super(Synscan, cls).__new__(cls)
 
     def run(self):
         resp = check()

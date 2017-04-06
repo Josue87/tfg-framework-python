@@ -84,19 +84,19 @@ class ModulePorts(Module, metaclass=abc.ABCMeta):
 
     def ports(self, p):
         print("Ports => " + p)
-        listaP = p.split(",")
-        for i in range(0, len(listaP)):
+        listP = p.split(",")
+        for i in range(0, len(listP)):
             try:
-                if listaP[i] != "":
-                    listaP[i] = int(listaP[i].strip())
-                    if(int(listaP[i]) <= 0 or int(listaP[i]) > 65535):
+                if listP[i] != "":
+                    listP[i] = int(listP[i].strip())
+                    if(int(listP[i]) <= 0 or int(listP[i]) > 65535):
                         raise Exception()
                 else:
-                    del listaP[i]
+                    del listP[i]
             except:
                 print("✕ Error configuring ports")
                 return
-        self.ports_list = listaP
+        self.ports_list = listP
 
     def conf(self):
         super(ModulePorts, self).conf()

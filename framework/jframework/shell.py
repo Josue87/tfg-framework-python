@@ -44,6 +44,8 @@ class Shell():
         module_load = loadModule(module)
         if(module_load is None):
             raise MyError("✕ Error loading module %s" % module)
+        if(module_load == -1):
+            return None
         print(str(module) + " loaded correctly")
 
         self.nameModule = module
@@ -132,7 +134,10 @@ class Shell():
                     else:
                         if (op[0] == "put"):
                             if (len(op) >= 3):
-                                getattr(self.myModule, op[1].lower())(op[2])
+                                par = op[2]
+                                if "ports" == op[1]:
+                                    par = ''.join(op[2:])
+                                getattr(self.myModule, op[1].lower())(par)
                             else:
                                 print("Parameter no found")
                                 return

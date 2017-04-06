@@ -1,6 +1,7 @@
 from jframework.modules.model import Module
 import jframework.extras.writeformat as wf
 from jframework.extras.check_scapy import check
+from jframework.extras.root import get_root
 import threading
 from time import sleep
 import logging
@@ -13,6 +14,16 @@ except:
     pass
 
 class Arp(Module):
+
+    def __new__(cls, *args, **kwargs):
+        if os.getuid() != 0:
+            # getRoot
+            use = get_root("spoofing/arp")
+            if use >= 0:
+                print("Now you don't have root permissions")
+                return -1 # Can't load again
+
+        return super(Arp, cls).__new__(cls)
 
     def __init__(self):
         super(Arp, self).__init__()
